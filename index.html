@@ -34,13 +34,22 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "2752998303";
+    const serviceWorkerVersion = "3417268154";
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
 <body>
   <script>
+    // Handle GitHub Pages routing
+    const savedPath = localStorage.getItem('path');
+    if (savedPath) {
+      localStorage.removeItem('path');
+      const base = '/ibhanu.github.io/';
+      if (!window.location.pathname.startsWith(base)) {
+        window.location.replace(base + '#' + savedPath);
+      }
+    }
     window.addEventListener('load', function(ev) {
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
