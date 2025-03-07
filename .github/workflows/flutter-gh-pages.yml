@@ -22,9 +22,12 @@ jobs:
         run: flutter pub get
         
       - name: Build web
-        run: flutter build web --base-href "/ibhanu.github.io/"
-        
-      - name: Deploy
+        run: flutter build web --base-href "/ibhanu.github.io/" --release
+
+      - name: Create .nojekyll file
+        run: touch build/web/.nojekyll
+
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

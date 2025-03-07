@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    // Handles Flutter web routing on GitHub Pages
+    (function () {
+      const path = window.location.pathname;
+      const base = '/ibhanu.github.io/';
+      if (path.startsWith(base)) {
+        localStorage.setItem('path', path.slice(base.length));
+      }
+      window.location.replace(base);
+    })();
+  </script>
+</head>
+<body>
+</body>
+</html>
