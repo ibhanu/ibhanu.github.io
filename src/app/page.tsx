@@ -11,6 +11,7 @@ import ResumeModal from '@/components/ResumeModal';
 import ImageLightbox from '@/components/ImageLightbox';
 import StickyScrollShowcase from '@/components/StickyScrollShowcase';
 import IPhoneMockup from '@/components/IPhoneMockup';
+import HeroVariants from '@/components/HeroVariants';
 import {
   Menu,
   X,
@@ -295,107 +296,12 @@ export default function BhanuDeveloperPortfolio() {
       {/* MAIN CONTENT WRAPPER */}
       <main id="top" className="pt-24 space-y-32 md:space-y-44">
 
-        {/* 2. ACT 1: THE DIMENSIONAL MONUMENT HERO */}
+        {/* 2. ACT 1: THE INTERACTIVE HERO WITH DIRECTION PREVIEWS */}
         <section
           data-sc-act="layered-depth"
-          className="relative max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-12 md:pt-20 sc-enter"
+          className="relative max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-6 md:pt-10 sc-enter"
         >
-          {/* Coordinates Header Tag */}
-          <div className="flex items-center gap-3 text-sm text-[#A2A3B0] font-medium mb-6">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
-            <span>Staff Mobile & Systems Engineering Leadership</span>
-            <span className="text-[#A2A3B0] hidden sm:inline">12.9716° N, 77.5946° E</span>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            
-            {/* Left Column: Monumental Title & Value Proposition */}
-            <div className="lg:col-span-7 space-y-7">
-              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-[#F5F5F7] leading-[0.95] font-display uppercase">
-                Mobile Systems at 900K+ Scale
-              </h1>
-
-              <p className="text-lg sm:text-xl text-[#E0E0E6] leading-relaxed max-w-2xl">
-                Engineering creator monetization engines, 200ms background isolate pipelines,
-                and multi-platform Indic speech SDKs from Bengaluru, India.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3.5 pt-2">
-                <a
-                  href="#showcase-rail"
-                  className="px-6 py-3.5 rounded-lg text-base font-semibold bg-[#D93800] text-white hover:bg-[#B82F00] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D93800]"
-                >
-                  Inspect Shipped Systems
-                </a>
-                <button
-                  onClick={() => setIsResumeOpen(true)}
-                  type="button"
-                  className="px-6 py-3.5 rounded-lg text-base font-semibold bg-[#121318] text-[#F5F5F7] hover:bg-[#1A1B22] transition-colors"
-                >
-                  Verified Credentials (PDF)
-                </button>
-                <a
-                  href={PROFILE_DATA.github}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-6 py-3.5 rounded-lg text-base font-semibold bg-[#121318] text-[#F5F5F7] hover:bg-[#1A1B22] transition-colors"
-                >
-                  GitHub Systems
-                </a>
-              </div>
-
-              {/* Verified Telemetry Instrumentation Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6">
-                <div className="p-5 rounded-xl bg-[#121318] space-y-1">
-                  <div className="text-2xl sm:text-3xl font-bold text-white font-display">
-                    900K+
-                  </div>
-                  <div className="text-sm text-[#A2A3B0] leading-tight">
-                    Store Downloads
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-xl bg-[#121318] space-y-1">
-                  <div className="text-2xl sm:text-3xl font-bold text-[#FF5520] font-display">
-                    $25M+
-                  </div>
-                  <div className="text-sm text-[#A2A3B0] leading-tight">
-                    Platform Volume
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-xl bg-[#121318] space-y-1">
-                  <div className="text-2xl sm:text-3xl font-bold text-[#10B981] font-display">
-                    200ms
-                  </div>
-                  <div className="text-sm text-[#A2A3B0] leading-tight">
-                    Socket Latency
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-xl bg-[#121318] space-y-1">
-                  <div className="text-2xl sm:text-3xl font-bold text-[#F59E0B] font-display">
-                    65%
-                  </div>
-                  <div className="text-sm text-[#A2A3B0] leading-tight">
-                    Crash Reduction
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: Physical Titanium Hardware Handset */}
-            <div className="lg:col-span-5 flex flex-col items-center">
-              <div className="w-full max-w-[320px] sm:max-w-[340px]">
-                <IPhoneMockup
-                  screenshotUrl="/screenshots/bigbang-1.webp"
-                  alt="BigBang.Social Flagship Creator Hub"
-                  appName="BigBang.Social Production Handset"
-                />
-              </div>
-            </div>
-          </div>
+          <HeroVariants onOpenResume={() => setIsResumeOpen(true)} />
         </section>
 
         {/* 3. ACT 2: HORIZONTAL PINNED SHOWCASE RAIL */}
