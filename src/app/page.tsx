@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   PROFILE_DATA,
   MOBILE_APPS,
@@ -32,6 +32,19 @@ export default function BhanuDeveloperPortfolio() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
+
+  // Pinned kinetic scroll refs & state
+  const bigbangRef = useRef<HTMLElement>(null);
+  const [bigbangStep, setBigbangStep] = useState(0);
+
+  const under25Ref = useRef<HTMLElement>(null);
+  const [under25Step, setUnder25Step] = useState(0);
+
+  const archRef = useRef<HTMLElement>(null);
+  const [archProgress, setArchProgress] = useState(0);
+
+  const sarvamRef = useRef<HTMLElement>(null);
+  const [sarvamProgress, setSarvamProgress] = useState(0);
   
   // Lightbox state
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -60,6 +73,74 @@ export default function BhanuDeveloperPortfolio() {
     }
   };
 
+  useEffect(() => {
+    let raf = 0;
+    const updateKineticScroll = () => {
+      const windowH = window.innerHeight;
+
+      // 1. BigBang Case Study Pinned Milestone Scrub
+      if (bigbangRef.current) {
+        const rect = bigbangRef.current.getBoundingClientRect();
+        const total = bigbangRef.current.offsetHeight - windowH;
+        if (total > 0) {
+          const p = Math.max(0, Math.min(1, -rect.top / total));
+          const step = Math.min(2, Math.floor(p * 3));
+          setBigbangStep(step);
+        }
+      }
+
+      // 2. Under 25 Concurrency Pinned Milestone Scrub
+      if (under25Ref.current) {
+        const rect = under25Ref.current.getBoundingClientRect();
+        const total = under25Ref.current.offsetHeight - windowH;
+        if (total > 0) {
+          const p = Math.max(0, Math.min(1, -rect.top / total));
+          const step = Math.min(2, Math.floor(p * 3));
+          setUnder25Step(step);
+        }
+      }
+
+      // 3. Silicon Architecture Pinned Layer Scrub
+      if (archRef.current) {
+        const rect = archRef.current.getBoundingClientRect();
+        const total = archRef.current.offsetHeight - windowH;
+        if (total > 0) {
+          const p = Math.max(0, Math.min(1, -rect.top / total));
+          setArchProgress(p);
+          const layerIdx = Math.min(ARCHITECTURE_LAYERS.length - 1, Math.floor(p * ARCHITECTURE_LAYERS.length));
+          setActiveArchLayer(layerIdx);
+        }
+      }
+
+      // 4. Sarvam AI Studio Pinned Multi-Platform Code Scrub
+      if (sarvamRef.current) {
+        const rect = sarvamRef.current.getBoundingClientRect();
+        const total = sarvamRef.current.offsetHeight - windowH;
+        if (total > 0) {
+          const p = Math.max(0, Math.min(1, -rect.top / total));
+          setSarvamProgress(p);
+          const tabIdx = Math.min(SARVAM_SDK_TABS.length - 1, Math.floor(p * SARVAM_SDK_TABS.length));
+          setSelectedSdkTab(tabIdx);
+        }
+      }
+    };
+
+    const handleScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(updateKineticScroll);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    updateKineticScroll();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
   const currentTab = SARVAM_SDK_TABS[selectedSdkTab] || SARVAM_SDK_TABS[0];
   const currentLayer = ARCHITECTURE_LAYERS[activeArchLayer] || ARCHITECTURE_LAYERS[0];
 
@@ -86,27 +167,27 @@ export default function BhanuDeveloperPortfolio() {
             </div>
           </a>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-[#E0E0E6]" aria-label="Main">
-            <a href="#showcase-rail" className="hover:text-white transition-colors">
-              Production Showcase
+          {/* Desktop Navigation Links (Strict Single Line) */}
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-7 text-[13px] xl:text-sm font-medium text-[#E0E0E6] whitespace-nowrap" aria-label="Main">
+            <a href="#showcase-rail" className="whitespace-nowrap hover:text-white transition-colors">
+              Showcase
             </a>
-            <a href="#bigbang" className="hover:text-white transition-colors">
+            <a href="#bigbang" className="whitespace-nowrap hover:text-white transition-colors">
               BigBang.Social
             </a>
-            <a href="#under25" className="hover:text-white transition-colors">
+            <a href="#under25" className="whitespace-nowrap hover:text-white transition-colors">
               Under 25
             </a>
-            <a href="#architecture" className="hover:text-white transition-colors">
-              Systems Architecture
+            <a href="#architecture" className="whitespace-nowrap hover:text-white transition-colors">
+              Architecture
             </a>
-            <a href="#sarvam" className="hover:text-white transition-colors">
-              Sarvam AI SDKs
+            <a href="#sarvam" className="whitespace-nowrap hover:text-white transition-colors">
+              Sarvam AI
             </a>
-            <a href="#opensource" className="hover:text-white transition-colors">
-              Consumer Craft
+            <a href="#opensource" className="whitespace-nowrap hover:text-white transition-colors">
+              Consumer Apps
             </a>
-            <a href="#contact" className="hover:text-white transition-colors">
+            <a href="#contact" className="whitespace-nowrap hover:text-white transition-colors">
               Contact
             </a>
           </nav>
@@ -340,135 +421,174 @@ export default function BhanuDeveloperPortfolio() {
         {/* 4. ACT 3: BIGBANG.SOCIAL FLAGSHIP DEEP-DIVE */}
         <section
           id="bigbang"
+          ref={bigbangRef}
           data-sc-act="case-study"
-          className="scroll-mt-24 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
+          className="scroll-mt-24 relative w-full lg:min-h-[220vh]"
         >
-          <div className="p-8 sm:p-12 lg:p-16 rounded-2xl bg-[#121318] space-y-12">
-            
-            {/* Header Plate */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 bg-[#181920] p-8 rounded-xl">
-              <div className="space-y-2">
-                <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
-                  BigBang.Social Super-App
-                </h2>
-                <p className="text-base text-[#E0E0E6] max-w-2xl">
-                  Architected India&apos;s premier creator monetization platform by Collective Artists Network, handling 500,000+ downloads
-                  and processing over $5M+ annually through multi-gateway payment abstraction layers.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <a
-                  href="https://apps.apple.com/us/app/bigbang-social/id6450163388"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
-                >
-                  <span>App Store</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://play.google.com/store/apps/details?id=com.collectiveartists.bigbangsocial"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
-                >
-                  <span>Google Play</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
-
-            {/* Architecture Highlights & Verified Outcomes Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          <div className="lg:sticky lg:top-20 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-8">
+            <div className="p-8 sm:p-12 lg:p-16 rounded-2xl bg-[#121318] space-y-10">
               
-              {/* Left Column: Systems Engineering Details */}
-              <div className="lg:col-span-7 space-y-6">
-                <h3 className="text-xl sm:text-2xl font-bold text-white font-display">
-                  Core Engineering Contributions
-                </h3>
-
-                <div className="space-y-4">
-                  <div className="p-6 rounded-xl bg-[#181920] space-y-2">
-                    <h4 className="text-lg font-bold text-white">
-                      Payment Abstraction Layer ($5M+ Annual Volume)
-                    </h4>
-                    <p className="text-base text-[#E0E0E6] leading-relaxed">
-                      Engineered a resilient multi-gateway adapter unifying Cashfree and Razorpay APIs.
-                      Zero dropped transactions during high-concurrency brand payout drops with automated retry fallbacks.
-                    </p>
-                  </div>
-
-                  <div className="p-6 rounded-xl bg-[#181920] space-y-2">
-                    <h4 className="text-lg font-bold text-white">
-                      65% Crash Reduction via Memory Profiling
-                    </h4>
-                    <p className="text-base text-[#E0E0E6] leading-relaxed">
-                      Conducted low-level memory inspection in Xcode Instruments and Android Studio Profiler,
-                      eliminating texture retention leaks and dropping crash rates from 2.1% down to 0.7%.
-                    </p>
-                  </div>
-
-                  <div className="p-6 rounded-xl bg-[#181920] space-y-2">
-                    <h4 className="text-lg font-bold text-white">
-                      Deep OS Integrations & Automated KYC
-                    </h4>
-                    <p className="text-base text-[#E0E0E6] leading-relaxed">
-                      Constructed custom platform channels bridging native iOS and Android media engines
-                      with Instagram Graph API, YouTube Data API, and DigiLocker instant verification.
-                    </p>
-                  </div>
+              {/* Header Plate */}
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 bg-[#181920] p-8 rounded-xl">
+                <div className="space-y-2">
+                  <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
+                    BigBang.Social Super-App
+                  </h2>
+                  <p className="text-base text-[#E0E0E6] max-w-2xl">
+                    Architected India&apos;s premier creator monetization platform by Collective Artists Network, handling 500,000+ downloads
+                    and processing over $5M+ annually through multi-gateway payment abstraction layers (Milestone {bigbangStep + 1} of 3).
+                  </p>
                 </div>
 
-                {/* Tech Stack Tags */}
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {['Flutter', 'MethodChannels', 'DigiLocker KYC', 'Cashfree', 'Razorpay', 'Fastlane', 'Mixpanel', 'CleverTap'].map((t) => (
-                    <span key={t} className="px-3.5 py-1.5 rounded-lg text-sm bg-[#181920] text-[#F5F5F7]">
-                      {t}
-                    </span>
-                  ))}
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href="https://apps.apple.com/us/app/bigbang-social/id6450163388"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
+                  >
+                    <span>App Store</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.collectiveartists.bigbangsocial"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
+                  >
+                    <span>Google Play</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
                 </div>
               </div>
 
-              {/* Right Column: 3 Verified Screenshots with Lightbox Trigger */}
-              <div className="lg:col-span-5 space-y-4">
-                <div className="text-base font-semibold text-white flex items-center justify-between">
-                  <span>Production App Screens</span>
-                  <span className="text-sm text-[#A2A3B0]">Tap image to inspect full-res</span>
-                </div>
+              {/* Architecture Highlights & Verified Outcomes Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                
+                {/* Left Column: Systems Engineering Details with Scroll-Driven Active Card */}
+                <div className="lg:col-span-7 space-y-4">
+                  <div className="flex items-center justify-between pb-1">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white font-display">
+                      Core Engineering Milestones
+                    </h3>
+                    <span className="text-[13px] text-[#A2A3B0] hidden sm:inline">
+                      Advances automatically as you scroll
+                    </span>
+                  </div>
 
-                <div className="grid grid-cols-3 gap-3">
-                  {MOBILE_APPS[0].screens.map((screen, idx) => (
-                    <button
-                      key={screen.id}
-                      type="button"
-                      onClick={() => openLightbox(MOBILE_APPS[0].screens, idx)}
-                      className="group rounded-xl overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D93800]"
+                  <div className="space-y-3">
+                    <div
+                      onClick={() => setBigbangStep(0)}
+                      className={`p-6 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
+                        bigbangStep === 0
+                          ? 'bg-[#1E2028] border-l-4 border-[#D93800] text-white'
+                          : 'bg-[#181920] opacity-75 hover:opacity-100 text-[#E0E0E6]'
+                      }`}
                     >
-                      <img
-                        src={screen.url}
-                        alt={screen.label}
-                        className="w-full aspect-[444/960] object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </button>
-                  ))}
+                      <h4 className="text-lg font-bold text-white">
+                        Payment Abstraction Layer ($5M+ Annual Volume)
+                      </h4>
+                      <p className="text-base leading-relaxed mt-2">
+                        Engineered a resilient multi-gateway adapter unifying Cashfree and Razorpay APIs.
+                        Zero dropped transactions during high-concurrency brand payout drops with automated retry fallbacks.
+                      </p>
+                    </div>
+
+                    <div
+                      onClick={() => setBigbangStep(1)}
+                      className={`p-6 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
+                        bigbangStep === 1
+                          ? 'bg-[#1E2028] border-l-4 border-[#D93800] text-white'
+                          : 'bg-[#181920] opacity-75 hover:opacity-100 text-[#E0E0E6]'
+                      }`}
+                    >
+                      <h4 className="text-lg font-bold text-white">
+                        65% Crash Reduction via Memory Profiling
+                      </h4>
+                      <p className="text-base leading-relaxed mt-2">
+                        Conducted low-level memory inspection in Xcode Instruments and Android Studio Profiler,
+                        eliminating texture retention leaks and dropping crash rates from 2.1% down to 0.7%.
+                      </p>
+                    </div>
+
+                    <div
+                      onClick={() => setBigbangStep(2)}
+                      className={`p-6 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
+                        bigbangStep === 2
+                          ? 'bg-[#1E2028] border-l-4 border-[#D93800] text-white'
+                          : 'bg-[#181920] opacity-75 hover:opacity-100 text-[#E0E0E6]'
+                      }`}
+                    >
+                      <h4 className="text-lg font-bold text-white">
+                        Deep OS Integrations & Automated KYC
+                      </h4>
+                      <p className="text-base leading-relaxed mt-2">
+                        Constructed custom platform channels bridging native iOS and Android media engines
+                        with Instagram Graph API, YouTube Data API, and DigiLocker instant verification.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Tech Stack Tags */}
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {['Flutter', 'MethodChannels', 'DigiLocker KYC', 'Cashfree', 'Razorpay', 'Fastlane', 'Mixpanel', 'CleverTap'].map((t) => (
+                      <span key={t} className="px-3.5 py-1.5 rounded-lg text-sm bg-[#181920] text-[#F5F5F7]">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
-                <p className="text-sm text-[#A2A3B0] pt-1">
-                  Screens: Brand Collaborations Hub, Social OAuth Analytics Pipeline, and Automated DigiLocker KYC settlement.
-                </p>
+                {/* Right Column: 3 Verified Screenshots synced to scroll */}
+                <div className="lg:col-span-5 space-y-4">
+                  <div className="text-base font-semibold text-white flex items-center justify-between">
+                    <span>Synchronized Screen State</span>
+                    <span className="text-sm text-[#A2A3B0]">Card {bigbangStep + 1} Focused</span>
+                  </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelected3DScreen('bigbang');
-                    setIs3DModalOpen(true);
-                  }}
-                  className="w-full py-2.5 px-3 rounded-lg text-[13px] font-semibold bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white transition-colors flex items-center justify-center gap-2"
-                >
-                  <RotateCcw className="w-3.5 h-3.5 text-[#D93800]" />
-                  <span>Inspect BigBang.Social on iPhone 18 Pro Max 3D</span>
-                </button>
+                  <div className="grid grid-cols-3 gap-3">
+                    {MOBILE_APPS[0].screens.map((screen, idx) => {
+                      const isActive = bigbangStep === idx;
+                      return (
+                        <button
+                          key={screen.id}
+                          type="button"
+                          onClick={() => {
+                            setBigbangStep(idx);
+                            openLightbox(MOBILE_APPS[0].screens, idx);
+                          }}
+                          className={`group rounded-xl overflow-hidden bg-black transition-[transform,opacity,border-color] duration-300 focus-visible:outline-none focus-visible:border-2 focus-visible:border-[#D93800] ${
+                            isActive
+                              ? 'border-2 border-[#D93800] scale-[1.03] opacity-100'
+                              : 'border-2 border-transparent opacity-50 hover:opacity-90'
+                          }`}
+                        >
+                          <img
+                            src={screen.url}
+                            alt={screen.label}
+                            className="w-full aspect-[444/960] object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <p className="text-sm text-[#A2A3B0] pt-1">
+                    Screens: Brand Collaborations Hub, Social OAuth Analytics Pipeline, and Automated DigiLocker KYC settlement.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelected3DScreen('bigbang');
+                      setIs3DModalOpen(true);
+                    }}
+                    className="w-full py-2.5 px-3 rounded-lg text-[13px] font-semibold bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white transition-colors flex items-center justify-center gap-2"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-[#D93800]" />
+                    <span>Inspect BigBang.Social on iPhone 18 Pro Max 3D</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -477,134 +597,173 @@ export default function BhanuDeveloperPortfolio() {
         {/* 5. ACT 4: UNDER 25 UNIVERSE DEEP-DIVE */}
         <section
           id="under25"
+          ref={under25Ref}
           data-sc-act="case-study"
-          className="scroll-mt-24 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
+          className="scroll-mt-24 relative w-full lg:min-h-[220vh]"
         >
-          <div className="p-8 sm:p-12 lg:p-16 rounded-2xl bg-[#121318] space-y-12">
-            
-            {/* Header Plate */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 bg-[#181920] p-8 rounded-xl">
-              <div className="space-y-2">
-                <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
-                  Under 25 Universe Ecosystem
-                </h2>
-                <p className="text-base text-[#E0E0E6] max-w-2xl">
-                  Spearheaded the mobile architecture for India&apos;s largest student network, supporting
-                  400,000+ users and enabling over $20M+ in campus micro-missions and platform earnings.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <a
-                  href="https://apps.apple.com/us/app/under-25/id1580357687"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
-                >
-                  <span>App Store</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://play.google.com/store/apps/details?id=com.under25universe.under25app"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
-                >
-                  <span>Google Play</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
-
-            {/* Architecture Highlights: Inverted Grid (Screens Left, Deep Concurrency Right) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          <div className="lg:sticky lg:top-20 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-8">
+            <div className="p-8 sm:p-12 lg:p-16 rounded-2xl bg-[#121318] space-y-10">
               
-              {/* Left Column: 3 Verified Screenshots with 3D Inspector Trigger */}
-              <div className="lg:col-span-5 space-y-4">
-                <div className="text-base font-semibold text-white flex items-center justify-between">
-                  <span>Student App Screens</span>
-                  <span className="text-sm text-[#A2A3B0]">Tap image to inspect full-res</span>
+              {/* Header Plate */}
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 bg-[#181920] p-8 rounded-xl">
+                <div className="space-y-2">
+                  <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
+                    Under 25 Universe Ecosystem
+                  </h2>
+                  <p className="text-base text-[#E0E0E6] max-w-2xl">
+                    Spearheaded the mobile architecture for India&apos;s largest student network, supporting
+                    400,000+ users and enabling over $20M+ in campus micro-missions and platform earnings (Milestone {under25Step + 1} of 3).
+                  </p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3">
-                  {MOBILE_APPS[1].screens.map((screen, idx) => (
-                    <button
-                      key={screen.id}
-                      type="button"
-                      onClick={() => openLightbox(MOBILE_APPS[1].screens, idx)}
-                      className="group rounded-xl overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]"
-                    >
-                      <img
-                        src={screen.url}
-                        alt={screen.label}
-                        className="w-full aspect-[442/960] object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </button>
-                  ))}
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href="https://apps.apple.com/us/app/under-25/id1580357687"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
+                  >
+                    <span>App Store</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.under25universe.under25app"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
+                  >
+                    <span>Google Play</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
                 </div>
-
-                <p className="text-sm text-[#A2A3B0] pt-1">
-                  Screens: Student Gigs Feed, 200ms Real-Time Campus Spaces, and Interactive Collectibles Wallet.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelected3DScreen('under25');
-                    setIs3DModalOpen(true);
-                  }}
-                  className="w-full py-2.5 px-3 rounded-lg text-[13px] font-semibold bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white transition-colors flex items-center justify-center gap-2"
-                >
-                  <RotateCcw className="w-3.5 h-3.5 text-[#10B981]" />
-                  <span>Inspect Under 25 on iPhone 18 Pro Max 3D</span>
-                </button>
               </div>
 
-              {/* Right Column: Systems Engineering Details */}
-              <div className="lg:col-span-7 space-y-6">
-                <h3 className="text-xl sm:text-2xl font-bold text-white font-display">
-                  Core Engineering Contributions
-                </h3>
-
-                <div className="space-y-4">
-                  <div className="p-6 rounded-xl bg-[#181920] space-y-2">
-                    <h4 className="text-lg font-bold text-white">
-                      200ms Low-Latency WebSocket Chat Engine
-                    </h4>
-                    <p className="text-base text-[#E0E0E6] leading-relaxed">
-                      Offloaded message JSON parsing and socket multiplexing to dedicated background Dart Isolates,
-                      dropping message latency from 500ms down to 200ms for campus discussion spaces.
-                    </p>
+              {/* Architecture Highlights: Inverted Grid (Screens Left, Deep Concurrency Right) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                
+                {/* Left Column: 3 Verified Screenshots synced to scroll */}
+                <div className="lg:col-span-5 space-y-4">
+                  <div className="text-base font-semibold text-white flex items-center justify-between">
+                    <span>Synchronized Screen State</span>
+                    <span className="text-sm text-[#A2A3B0]">Card {under25Step + 1} Focused</span>
                   </div>
 
-                  <div className="p-6 rounded-xl bg-[#181920] space-y-2">
-                    <h4 className="text-lg font-bold text-white">
-                      30+ Reusable Design System Component Library
-                    </h4>
-                    <p className="text-base text-[#E0E0E6] leading-relaxed">
-                      Standardized core widgets across missions, wallets, and community feeds,
-                      accelerating cross-team delivery cycles by 30% and eliminating visual regressions.
-                    </p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {MOBILE_APPS[1].screens.map((screen, idx) => {
+                      const isActive = under25Step === idx;
+                      return (
+                        <button
+                          key={screen.id}
+                          type="button"
+                          onClick={() => {
+                            setUnder25Step(idx);
+                            openLightbox(MOBILE_APPS[1].screens, idx);
+                          }}
+                          className={`group rounded-xl overflow-hidden bg-black transition-[transform,opacity,border-color] duration-300 focus-visible:outline-none focus-visible:border-2 focus-visible:border-[#10B981] ${
+                            isActive
+                              ? 'border-2 border-[#10B981] scale-[1.03] opacity-100'
+                              : 'border-2 border-transparent opacity-50 hover:opacity-90'
+                          }`}
+                        >
+                          <img
+                            src={screen.url}
+                            alt={screen.label}
+                            className="w-full aspect-[442/960] object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </button>
+                      );
+                    })}
                   </div>
 
-                  <div className="p-6 rounded-xl bg-[#181920] space-y-2">
-                    <h4 className="text-lg font-bold text-white">
-                      60 FPS Rendering in Low-Bandwidth Networks
-                    </h4>
-                    <p className="text-base text-[#E0E0E6] leading-relaxed">
-                      Implemented custom local caching layers and repaint boundaries,
-                      preventing layout thrashing on budget Android devices across 400+ campus regions.
-                    </p>
-                  </div>
+                  <p className="text-sm text-[#A2A3B0] pt-1">
+                    Screens: Student Gigs Feed, 200ms Real-Time Campus Spaces, and Interactive Collectibles Wallet.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelected3DScreen('under25');
+                      setIs3DModalOpen(true);
+                    }}
+                    className="w-full py-2.5 px-3 rounded-lg text-[13px] font-semibold bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white transition-colors flex items-center justify-center gap-2"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-[#10B981]" />
+                    <span>Inspect Under 25 on iPhone 18 Pro Max 3D</span>
+                  </button>
                 </div>
 
-                {/* Tech Stack Tags */}
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {['Flutter', 'WebSockets', 'Dart Isolates', '30+ Widget System', 'A/B Testing Engine', '60 FPS Profiling'].map((t) => (
-                    <span key={t} className="px-3.5 py-1.5 rounded-lg text-sm bg-[#181920] text-[#F5F5F7]">
-                      {t}
+                {/* Right Column: Systems Engineering Details with Scroll-Driven Active Card */}
+                <div className="lg:col-span-7 space-y-4">
+                  <div className="flex items-center justify-between pb-1">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white font-display">
+                      Core Engineering Milestones
+                    </h3>
+                    <span className="text-[13px] text-[#A2A3B0] hidden sm:inline">
+                      Advances automatically as you scroll
                     </span>
-                  ))}
+                  </div>
+
+                  <div className="space-y-3">
+                    <div
+                      onClick={() => setUnder25Step(0)}
+                      className={`p-6 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
+                        under25Step === 0
+                          ? 'bg-[#1E2028] border-l-4 border-[#10B981] text-white'
+                          : 'bg-[#181920] opacity-75 hover:opacity-100 text-[#E0E0E6]'
+                      }`}
+                    >
+                      <h4 className="text-lg font-bold text-white">
+                        200ms Low-Latency WebSocket Chat Engine
+                      </h4>
+                      <p className="text-base leading-relaxed mt-2">
+                        Offloaded message JSON parsing and socket multiplexing to dedicated background Dart Isolates,
+                        dropping message latency from 500ms down to 200ms for campus discussion spaces.
+                      </p>
+                    </div>
+
+                    <div
+                      onClick={() => setUnder25Step(1)}
+                      className={`p-6 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
+                        under25Step === 1
+                          ? 'bg-[#1E2028] border-l-4 border-[#10B981] text-white'
+                          : 'bg-[#181920] opacity-75 hover:opacity-100 text-[#E0E0E6]'
+                      }`}
+                    >
+                      <h4 className="text-lg font-bold text-white">
+                        30+ Reusable Design System Component Library
+                      </h4>
+                      <p className="text-base leading-relaxed mt-2">
+                        Standardized core widgets across missions, wallets, and community feeds,
+                        accelerating cross-team delivery cycles by 30% and eliminating visual regressions.
+                      </p>
+                    </div>
+
+                    <div
+                      onClick={() => setUnder25Step(2)}
+                      className={`p-6 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
+                        under25Step === 2
+                          ? 'bg-[#1E2028] border-l-4 border-[#10B981] text-white'
+                          : 'bg-[#181920] opacity-75 hover:opacity-100 text-[#E0E0E6]'
+                      }`}
+                    >
+                      <h4 className="text-lg font-bold text-white">
+                        60 FPS Rendering in Low-Bandwidth Networks
+                      </h4>
+                      <p className="text-base leading-relaxed mt-2">
+                        Implemented custom local caching layers and repaint boundaries,
+                        preventing layout thrashing on budget Android devices across 400+ campus regions.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Tech Stack Tags */}
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {['Flutter', 'WebSockets', 'Dart Isolates', '30+ Widget System', 'A/B Testing Engine', '60 FPS Profiling'].map((t) => (
+                      <span key={t} className="px-3.5 py-1.5 rounded-lg text-sm bg-[#181920] text-[#F5F5F7]">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -614,229 +773,257 @@ export default function BhanuDeveloperPortfolio() {
         {/* 6. ACT 5: ARCHITECTURAL LAYERS & SILICON BRIDGE */}
         <section
           id="architecture"
+          ref={archRef}
           data-sc-act="curtain-reveal"
-          className="scroll-mt-24 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
+          className="scroll-mt-24 relative w-full lg:min-h-[240vh]"
         >
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
-                Flutter to Silicon Internals
-              </h2>
-              <p className="text-base text-[#E0E0E6] max-w-2xl mt-2">
-                Inspect the four architectural layers powering 60 FPS rendering, background isolates,
-                and native OS bridges across production deployments.
-              </p>
-            </div>
-
-            {/* Layer Selection Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {ARCHITECTURE_LAYERS.map((layer, idx) => {
-                const isSelected = activeArchLayer === idx;
-                return (
-                  <button
-                    key={layer.id}
-                    type="button"
-                    onClick={() => setActiveArchLayer(idx)}
-                    className={`p-5 rounded-xl text-left transition-colors ${
-                      isSelected
-                        ? 'bg-[#1E2028] text-white border-2 border-[#D93800]'
-                        : 'bg-[#121318] text-[#E0E0E6] hover:bg-[#181920] hover:text-white'
-                    }`}
-                  >
-                    <div className="text-sm text-[#FF5520] font-semibold mb-1">
-                      Layer {idx + 1}
-                    </div>
-                    <div className="text-lg font-bold text-white font-display">
-                      {layer.name.replace(/LAYER \d+ \/\/ /, '')}
-                    </div>
-                    <div className="text-sm mt-2 text-[#A2A3B0]">
-                      {layer.metrics}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Selected Layer Architectural Breakdown */}
-            <div className="p-8 sm:p-12 rounded-2xl bg-[#121318] space-y-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 bg-[#181920] p-6 rounded-xl">
+          <div className="lg:sticky lg:top-20 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-8">
+            <div className="space-y-6">
+              
+              {/* Header Plate with Kinetic Progress Scrubber */}
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                  <h3 className="text-2xl font-bold text-white font-display">
-                    {currentLayer.name}
-                  </h3>
-                  <p className="text-sm text-[#FF5520] mt-0.5">
-                    {currentLayer.subtitle}
+                  <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
+                    Flutter to Silicon Internals
+                  </h2>
+                  <p className="text-base text-[#E0E0E6] max-w-2xl mt-1">
+                    Inspect the four architectural layers powering 60 FPS rendering, background isolates,
+                    and native OS bridges across production deployments (Layer {activeArchLayer + 1} of 4).
                   </p>
                 </div>
-                <div className="px-4 py-2 rounded-lg bg-[#22232D] text-sm text-[#F5F5F7] font-semibold self-start md:self-auto">
-                  {currentLayer.metrics}
+
+                {/* Kinetic Progress Bar */}
+                <div className="w-full md:w-64 bg-[#181920] rounded-full h-3 p-0.5 overflow-hidden">
+                  <div
+                    className="bg-[#D93800] h-full rounded-full transition-[width] duration-150"
+                    style={{ width: `${Math.round(archProgress * 100)}%` }}
+                  />
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <h4 className="text-base font-semibold text-white">
-                  Architectural Specifications
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {currentLayer.details.map((detail, i) => (
-                    <div key={i} className="p-5 rounded-xl bg-[#181920] text-sm sm:text-base text-[#E0E0E6] leading-relaxed">
-                      {detail}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Ambient Engine Video Loop */}
-              <div className="rounded-xl overflow-hidden bg-[#070709] max-h-[240px] flex items-center justify-center">
-                <video
-                  src="/videos/abstract-painting-shapes-opt.mp4"
-                  poster="/images/triptych-background.png"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover opacity-60"
-                />
-              </div>
-
-              <div className="pt-2 flex flex-wrap gap-2">
-                {currentLayer.tech.map((t) => (
-                  <span key={t} className="px-3.5 py-1.5 rounded-lg text-sm bg-[#181920] text-[#F5F5F7]">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 7. ACT 6: SARVAM AI STUDIO (THE PEAK — INTERACTIVE STAGE) */}
-        <section
-          id="sarvam"
-          data-sc-act="interactive-stage"
-          className="scroll-mt-24 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-16 sc-enter"
-        >
-          <div className="space-y-8">
-            
-            {/* Peak Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div>
-                <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
-                  Sarvam AI Mobile SDKs
-                </h2>
-                <p className="text-base text-[#E0E0E6] max-w-2xl mt-2">
-                  Author of the official client SDK monorepo for Sarvam AI&apos;s Indic-first speech and language platform.
-                  Clean Architecture across iOS, Android, Flutter, React Native, and Go with 97.8% test coverage.
-                </p>
-              </div>
-
-              <a
-                href="https://github.com/ibhanu/sarvam-mobile"
-                target="_blank"
-                rel="noreferrer"
-                className="px-5 py-3 rounded-lg text-sm font-semibold bg-[#D93800] text-white hover:bg-[#B82F00] transition-colors flex items-center gap-2 self-start md:self-auto"
-              >
-                <span>Inspect Monorepo on GitHub</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            </div>
-
-            {/* Interactive Multi-Platform Code Workbench */}
-            <div className="p-6 sm:p-10 rounded-2xl bg-[#121318] space-y-6">
-              
-              {/* Platform Selector Tabs */}
-              <div className="flex flex-wrap gap-2">
-                {SARVAM_SDK_TABS.map((tab, idx) => {
-                  const isSelected = selectedSdkTab === idx;
+              {/* Layer Selection Buttons (Auto-highlighted on scroll, or click to jump) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {ARCHITECTURE_LAYERS.map((layer, idx) => {
+                  const isSelected = activeArchLayer === idx;
                   return (
                     <button
-                      key={tab.id}
+                      key={layer.id}
                       type="button"
-                      onClick={() => setSelectedSdkTab(idx)}
-                      className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                      onClick={() => setActiveArchLayer(idx)}
+                      className={`p-5 rounded-xl text-left transition-colors ${
                         isSelected
-                          ? 'bg-[#D93800] text-white'
-                          : 'bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white'
+                          ? 'bg-[#1E2028] text-white border-2 border-[#D93800]'
+                          : 'bg-[#121318] text-[#E0E0E6] hover:bg-[#181920] hover:text-white'
                       }`}
                     >
-                      {tab.label}
+                      <div className="text-sm text-[#FF5520] font-semibold mb-1">
+                        Layer {idx + 1}
+                      </div>
+                      <div className="text-lg font-bold text-white font-display">
+                        {layer.name.replace(/LAYER \d+ \/\/ /, '')}
+                      </div>
+                      <div className="text-sm mt-2 text-[#A2A3B0]">
+                        {layer.metrics}
+                      </div>
                     </button>
                   );
                 })}
               </div>
 
-              {/* Tab Header Plate */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#181920] p-4 rounded-xl">
-                <div>
-                  <span className="text-base font-bold text-white block">
-                    {currentTab.packageBadge}
-                  </span>
-                  <span className="text-sm text-[#A2A3B0]">
-                    {currentTab.architectureNote}
-                  </span>
+              {/* Selected Layer Architectural Breakdown */}
+              <div className="p-8 sm:p-10 rounded-2xl bg-[#121318] space-y-5">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 bg-[#181920] p-6 rounded-xl">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white font-display">
+                      {currentLayer.name}
+                    </h3>
+                    <p className="text-sm text-[#FF5520] mt-0.5">
+                      {currentLayer.subtitle}
+                    </p>
+                  </div>
+                  <div className="px-4 py-2 rounded-lg bg-[#22232D] text-sm text-[#F5F5F7] font-semibold self-start md:self-auto">
+                    {currentLayer.metrics}
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => copyCodeToClipboard(currentTab.code)}
-                    type="button"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-[#22232D] text-[#F5F5F7] hover:bg-[#2C2E3B] transition-colors"
-                  >
-                    {copiedCode ? (
-                      <>
-                        <Check className="w-4 h-4 text-[#10B981]" />
-                        <span className="text-[#10B981]">Copied</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4" />
-                        <span>Copy Code</span>
-                      </>
-                    )}
-                  </button>
+                <div className="space-y-3">
+                  <h4 className="text-base font-semibold text-white">
+                    Architectural Specifications
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {currentLayer.details.map((detail, i) => (
+                      <div key={i} className="p-5 rounded-xl bg-[#181920] text-sm sm:text-base text-[#E0E0E6] leading-relaxed">
+                        {detail}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Ambient Engine Video Loop */}
+                <div className="rounded-xl overflow-hidden bg-[#070709] max-h-[160px] flex items-center justify-center">
+                  <video
+                    src="/videos/abstract-painting-shapes-opt.mp4"
+                    poster="/images/triptych-background.png"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="w-full h-full object-cover opacity-60"
+                  />
+                </div>
+
+                <div className="pt-1 flex flex-wrap gap-2">
+                  {currentLayer.tech.map((t) => (
+                    <span key={t} className="px-3.5 py-1.5 rounded-lg text-sm bg-[#181920] text-[#F5F5F7]">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 7. ACT 6: SARVAM AI STUDIO (THE PEAK — PINNED KINETIC WORKBENCH) */}
+        <section
+          id="sarvam"
+          ref={sarvamRef}
+          data-sc-act="interactive-stage"
+          className="scroll-mt-24 relative w-full lg:min-h-[260vh]"
+        >
+          <div className="lg:sticky lg:top-20 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-8">
+            <div className="space-y-6">
+              
+              {/* Peak Header with Scroll Scrubber Bar */}
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                  <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
+                    Sarvam AI Mobile SDKs
+                  </h2>
+                  <p className="text-base text-[#E0E0E6] max-w-2xl mt-1">
+                    Author of the official client SDK monorepo for Sarvam AI&apos;s Indic-first speech and language platform.
+                    Clean Architecture across iOS, Android, Flutter, React Native, and Go with 97.8% test coverage (Platform {selectedSdkTab + 1} of 5: {currentTab.label}).
+                  </p>
+                </div>
+
+                <div className="flex flex-col items-start md:items-end gap-2">
                   <a
-                    href={currentTab.packageUrl}
+                    href="https://github.com/ibhanu/sarvam-mobile"
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm bg-[#22232D] text-[#F5F5F7] hover:bg-[#2C2E3B] transition-colors"
+                    className="px-5 py-3 rounded-lg text-sm font-semibold bg-[#D93800] text-white hover:bg-[#B82F00] transition-colors flex items-center gap-2 self-start md:self-auto"
                   >
-                    <span>Package</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Inspect Monorepo on GitHub</span>
+                    <ExternalLink className="w-4 h-4" />
                   </a>
+
+                  {/* Kinetic Progress Bar */}
+                  <div className="w-full md:w-56 bg-[#181920] rounded-full h-2.5 p-0.5 overflow-hidden">
+                    <div
+                      className="bg-[#10B981] h-full rounded-full transition-[width] duration-150"
+                      style={{ width: `${Math.round(sarvamProgress * 100)}%` }}
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Verified Production Code Block */}
-              <div
-                data-ui="code-block"
-                className="relative rounded-xl overflow-hidden bg-[#070709] p-5 sm:p-7"
-              >
-                <div className="flex items-center justify-between pb-3 text-sm text-[#A2A3B0]">
-                  <span className="flex items-center gap-2">
-                    <Terminal className="w-4 h-4 text-[#FF5520]" />
-                    <span>Production Implementation Snippet ({currentTab.language})</span>
-                  </span>
-                  <span>97.8% Tested</span>
+              {/* Interactive Multi-Platform Code Workbench */}
+              <div className="p-6 sm:p-10 rounded-2xl bg-[#121318] space-y-6">
+                
+                {/* Platform Selector Tabs (Scrubbed on scroll or clickable) */}
+                <div className="flex flex-wrap gap-2">
+                  {SARVAM_SDK_TABS.map((tab, idx) => {
+                    const isSelected = selectedSdkTab === idx;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setSelectedSdkTab(idx)}
+                        className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                          isSelected
+                            ? 'bg-[#D93800] text-white'
+                            : 'bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                <pre className="text-sm text-[#F5F5F7] overflow-x-auto leading-relaxed pt-2 px-2">
-                  <code>{currentTab.code}</code>
-                </pre>
-              </div>
+                {/* Tab Header Plate */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#181920] p-4 rounded-xl">
+                  <div>
+                    <span className="text-base font-bold text-white block">
+                      {currentTab.packageBadge}
+                    </span>
+                    <span className="text-sm text-[#A2A3B0]">
+                      {currentTab.architectureNote}
+                    </span>
+                  </div>
 
-              {/* Telemetry Footnote */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                <div className="p-4 rounded-xl bg-[#181920]">
-                  <div className="text-base font-bold text-white">4 Client SDKs</div>
-                  <div className="text-sm text-[#A2A3B0] mt-0.5">Flutter, SwiftPM, Kotlin, and React Native TurboModules</div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => copyCodeToClipboard(currentTab.code)}
+                      type="button"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-[#22232D] text-[#F5F5F7] hover:bg-[#2C2E3B] transition-colors"
+                    >
+                      {copiedCode ? (
+                        <>
+                          <Check className="w-4 h-4 text-[#10B981]" />
+                          <span className="text-[#10B981]">Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          <span>Copy Code</span>
+                        </>
+                      )}
+                    </button>
+                    <a
+                      href={currentTab.packageUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm bg-[#22232D] text-[#F5F5F7] hover:bg-[#2C2E3B] transition-colors"
+                    >
+                      <span>Package</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
                 </div>
-                <div className="p-4 rounded-xl bg-[#181920]">
-                  <div className="text-base font-bold text-[#10B981]">97.8% Coverage</div>
-                  <div className="text-sm text-[#A2A3B0] mt-0.5">Automated unit and integration test suites with CI/CD</div>
+
+                {/* Verified Production Code Block */}
+                <div
+                  data-ui="code-block"
+                  className="relative rounded-xl overflow-hidden bg-[#070709] p-5 sm:p-7"
+                >
+                  <div className="flex items-center justify-between pb-3 text-sm text-[#A2A3B0]">
+                    <span className="flex items-center gap-2">
+                      <Terminal className="w-4 h-4 text-[#FF5520]" />
+                      <span>Production Implementation Snippet ({currentTab.language})</span>
+                    </span>
+                    <span>97.8% Tested</span>
+                  </div>
+
+                  <pre className="text-sm text-[#F5F5F7] overflow-x-auto leading-relaxed pt-2 px-2">
+                    <code>{currentTab.code}</code>
+                  </pre>
                 </div>
-                <div className="p-4 rounded-xl bg-[#181920]">
-                  <div className="text-base font-bold text-[#FF5520]">10+ Indic Languages</div>
-                  <div className="text-sm text-[#A2A3B0] mt-0.5">Real-time PCM voice streaming for Hindi, Tamil, Kannada, and more</div>
+
+                {/* Telemetry Footnote */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                  <div className="p-4 rounded-xl bg-[#181920]">
+                    <div className="text-base font-bold text-white">4 Client SDKs</div>
+                    <div className="text-sm text-[#A2A3B0] mt-0.5">Flutter, SwiftPM, Kotlin, and React Native TurboModules</div>
+                  </div>
+                  <div className="p-4 rounded-xl bg-[#181920]">
+                    <div className="text-base font-bold text-[#10B981]">97.8% Coverage</div>
+                    <div className="text-sm text-[#A2A3B0] mt-0.5">Automated unit and integration test suites with CI/CD</div>
+                  </div>
+                  <div className="p-4 rounded-xl bg-[#181920]">
+                    <div className="text-base font-bold text-[#FF5520]">10+ Indic Languages</div>
+                    <div className="text-sm text-[#A2A3B0] mt-0.5">Real-time PCM voice streaming for Hindi, Tamil, Kannada, and more</div>
+                  </div>
                 </div>
               </div>
             </div>
