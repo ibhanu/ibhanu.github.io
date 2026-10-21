@@ -1,86 +1,58 @@
-# Flutter on Codespaces
+# Bhanu Pratap — 3D Systems & Mobile Portfolio
 
-This is a template repository for developing with [Flutter](https://flutter.dev/) on the web on [GitHub Codespaces](https://github.com/features/codespaces).
+> Interactive, scroll-driven 3D developer portfolio and architectural showcase built with Next.js, React, Three.js, React Three Fiber, Spline curves, and Tailwind CSS. Hosted directly via GitHub Pages on [ibhanu.github.io](https://ibhanu.github.io).
 
-Flutter is a cross-platform UI framework by Google for building apps. Codespaces is a cloud-based development environment that lets you run a full-featured IDE in the cloud. This template repository lets you get started with Flutter on Codespaces in just a few clicks.
+[![Deploy to GitHub Pages](https://github.com/ibhanu/ibhanu.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/ibhanu/ibhanu.github.io/actions/workflows/deploy.yml)
+[![Live Site](https://img.shields.io/badge/Live-ibhanu.github.io-FF4F1F?style=flat&logo=safari&logoColor=white)](https://ibhanu.github.io)
 
-**Table of Contents**
-- [Important things to note](#important-things-to-note)
-- [Setup](#setup)
-  - [Getting started](#getting-started)
-  - [Using a sample](#using-a-sample)
-- [Development Environment](#development-environment)
-  - [Developing in the browser](#developing-in-the-browser)
-  - [Developing in the desktop app](#developing-in-the-desktop-app)
-- [Flutter Development](#flutter-development)
-  - [Developing for mobile](#developing-for-mobile)
-- [Codespaces Usage](#codespaces-usage)
-  - [Managing your codespace](#managing-your-codespace)
+---
 
-This repository is generated from the [dilanx/flutter-codespaces](https://github.com/dilanx/flutter-codespaces) repository.
+## 🏛️ Architectural Overview
 
-## Important things to note
+- **3D Interactive Device Stage**: WebGL canvas running Three.js + React Three Fiber (`TriptychWorld3D.tsx`) featuring real 3D mobile handset models with brushed metal finish, rim lighting, dynamic island accents, and actual screenshot textures from production applications.
+- **Scrollcraft Engine**: Zero-dependency `requestAnimationFrame` scroll progress normalizer (`--sc-p` from `0.0000` to `1.0000`) and velocity tracker (`--sc-v`) driving camera lerp and device rotation without layout thrashing.
+- **3D Spline Telemetry Curves**: Architectural 3D Catmull-Rom spline arcs rendered in space with flowing particle packets representing 200ms WebSocket messages, $5M+ transaction events, and native FFI bridging calls.
+- **Interactive Device Inspector**: Real-time screen switcher + 3D Orbit toggle allowing visitors to grab, spin, and inspect handsets in 3D.
+- **Verified Resume Modal & PDF**: On-page verified resume inspector with one-click PDF download (`/Bhanu_Pratap_Resume.pdf`) and clipboard email copy.
+- **Automated GitHub Pages CI/CD**: Workflow in `.github/workflows/deploy.yml` that compiles Next.js static export (`output: 'export'`) and publishes to GitHub Pages via `actions/deploy-pages@v4`.
 
-Codespaces is not completely free. Free users have 120 core-hours per month and Pro users have 180 core-hours per month. The default codespace runs on a 2-core machine, so that's 60 hours (or 90 hours) of free usage per month before getting charged. Make sure to stop your codespace when you're not using it (it automatically stops after 30 minutes of inactivity by default). See more pricing details [here](https://docs.github.com/en/billing/managing-billing-for-github-codespaces/about-billing-for-github-codespaces), and manage your active codespaces [here](https://github.com/codespaces).
+---
 
-## Setup
+## 📱 Shipped Work Showcased
 
-### Getting started
+1. **BigBang.Social** (Tech Lead App, Jul 2023 – Apr 2026):
+   - 500,000+ downloads, $5M+ annual creator payouts via Cashfree & Razorpay abstraction layers.
+   - 65% crash reduction (2.1% → 0.7%), 18% Day-30 retention lift, 75% faster CI/CD deployments.
+2. **Under 25 Universe** (Senior Flutter Developer, Oct 2021 – Jun 2023):
+   - 400,000+ student users, $20M+ in platform earnings.
+   - Real-time WebSocket chat with isolate background threading reducing latency from 500ms to 200ms.
+   - 30+ reusable UI component library, 60 FPS jank-free rendering.
+3. **Aura Dating** (Open-Source Flutter + Supabase):
+   - Card swipe gesture physics, realtime Postgres chat, Clean Architecture (Data/Domain/Presentation).
+4. **Mango: Daily Affirmations** (Consumer Flutter + iOS WidgetKit):
+   - 60 FPS accelerometer parallax, mascot progression streak system, native iOS Home/Lock screen widgets.
+5. **Sarvam AI Mobile SDKs** (Monorepo):
+   - Official 4-platform SDK suite (Flutter, iOS SwiftPM, Android Kotlin, React Native) with <600 KB Rust FFI core and 97.8% test coverage.
+6. **Go Microservice Template**:
+   - Production Go 1.24 Clean Architecture boilerplate with Prisma PostgreSQL, JWT auth, and Docker Compose.
 
-1. Press "Use this template" towards the top right of this repository and create a new repository from this template.
+---
 
-    > There's also an option to open this repository in Codespaces and publish it to GitHub later from there, but I recommend creating your own repository first.
+## 🛠️ Local Development
 
-2. In your new repository, press "Code", select "Codespaces", then press "Create codespace on main". A container with everything you need to get started will be created automatically, then you'll be taken to your new codespace (VS Code in your browser). If you'd prefer to work on your codespace using the VS Code desktop app instead of the browser app, you can follow these instructions.
+```bash
+# Install dependencies
+npm install
 
-3. Press the "Extensions" icon in the left sidebar. You'll see that the Flutter and Dart extensions are already being installed. The environment won't work properly until the installation is complete, so wait for it to finish.
+# Start local dev server (http://localhost:3000)
+npm run dev
 
-4. In your integrated terminal (the TERMINAL tab), run `flutter pub get` to install the missing Flutter dependencies.
+# Compile production static export (outputs to ./out)
+npm run build
+```
 
-5. In the ports view (the PORTS tab), port 3000 should be listed there already. Right click on it, and, under "Port Visibility", select "Public". This is important so the app can access services on your client from other server ports without getting blocked due to CORS.
+---
 
-6. Run `./run.sh` in the terminal to start the app. A notification will appear saying that an app opened on port 3000. You can press "Open in Browser" to open it, but it won't load until the terminal shows that it's ready. You can refresh once the app is loaded (as indicated by a prompt to press "R" to reload).
+## 📄 License
 
-    > You can find the link to access the app in your browser at any time by going to the ports view, right clicking on port 3000, and pressing "Open in Browser".
-
-7. That's it! Make changes in `lib/main.dart`, press "R" in the terminal, then refresh the page to see your changes appear quickly.
-
-### Using a sample
-
-There are a collection of sample Flutter apps you can use. They're stored in the `samples` directory. If you want to use one of them, find the folder of the sample you want to use, then move the contents of the folder into the root of your repository. At minimum, this should overwrite `pubspec.yaml` and `lib`.
-
-## Development Environment
-
-### Developing in the browser
-
-The browser-based VS Code is the default editor for Codespaces, and has most of the features you'd need. Opening your codespace from [github.com/codespaces](https://github.com/codespaces) will automatically open the browser-based editor.
-
-### Developing in the desktop app
-
-If you'd prefer to use the desktop app version of VS Code, you can follow these instructions:
-
-1. Download the [VS Code desktop app](https://code.visualstudio.com/). You probably already have it if you chose to follow these instructions.
-
-2. Install the [GitHub Codespaces extension](https://marketplace.visualstudio.com/items?itemName=GitHub.codespaces).
-
-3. Open the command pallette from the View menu (or cmd+shift+P / ctrl+shift+P) and run "Codespaces: Connect to Codespace...".
-
-    > Alternatively, click the button in the very bottom left of VS Code (it says "Open a Remote Window" if you hover over it) and press "Connect to Codespace...".
-
-4. Log in if necessary, then select your codespace from the list.
-
-## Flutter Development
-
-### Developing for mobile
-
-Running Flutter in Codespaces makes it a bit difficult to run the app in a mobile simulator. However, developing for the web is basically the same as developing for mobile. I'd recommend opening your browser's developer tools and selecting a mobile device to emulate.
-
-If you're using Chrome or another Chromium-based browser, you can open DevTools like [this](https://developer.chrome.com/docs/devtools/open/) and emulate a device like [this](https://developer.chrome.com/docs/devtools/device-mode/). It'll be pretty similar for other browsers like Safari and Firefox.
-
-## Codespaces Usage
-
-### Managing your codespace
-
-When you're not using your codespace, deactivate it by going to [Codespaces](https://github.com/codespaces), pressing the 3 dots on the right side of the codespace, and pressing "Stop codespace". You can also deactivate it within the codespace by pressing "Codespaces" at the bottom left of VS Code and selecting "Stop Current Codespace".
-
-Edited files in your workspace are not deleted when stopping the codespace and the container won't need to be rebuilt when you start it again. Provided that you're under the storage limit (15 GB for Free users and 20 GB for Pro), you won't be charged if your codespace is offline. I recommend committing your repository changes on your codespace often to avoid losing work if you were to delete your codespace.
+MIT © [Bhanu Pratap](https://github.com/ibhanu)
