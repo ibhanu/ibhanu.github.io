@@ -11,6 +11,7 @@ import ResumeModal from '@/components/ResumeModal';
 import ImageLightbox from '@/components/ImageLightbox';
 import StickyScrollShowcase from '@/components/StickyScrollShowcase';
 import IPhoneMockup from '@/components/IPhoneMockup';
+import IPhone3DModal from '@/components/IPhone3DModal';
 import {
   Menu,
   X,
@@ -19,12 +20,15 @@ import {
   Terminal,
   ExternalLink,
   ArrowRight,
+  RotateCcw,
 } from 'lucide-react';
 
 export default function BhanuDeveloperPortfolio() {
   const [selectedSdkTab, setSelectedSdkTab] = useState(0);
   const [activeArchLayer, setActiveArchLayer] = useState(0);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
+  const [is3DModalOpen, setIs3DModalOpen] = useState(false);
+  const [selected3DScreen, setSelected3DScreen] = useState<'bigbang' | 'under25' | 'sarvam' | 'aura'>('bigbang');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -305,7 +309,7 @@ export default function BhanuDeveloperPortfolio() {
             </div>
 
             {/* Right Column: Physical Titanium Hardware Handset */}
-            <div className="lg:col-span-5 flex justify-center">
+            <div className="lg:col-span-5 flex flex-col items-center">
               <div className="w-full max-w-[320px] sm:max-w-[340px]">
                 <IPhoneMockup
                   screenshotUrl="/screenshots/bigbang-1.webp"
@@ -313,6 +317,19 @@ export default function BhanuDeveloperPortfolio() {
                   appName="BigBang.Social Production Handset"
                 />
               </div>
+
+              {/* Interactive 3D Hardware Inspector Trigger */}
+              <button
+                type="button"
+                onClick={() => {
+                  setSelected3DScreen('bigbang');
+                  setIs3DModalOpen(true);
+                }}
+                className="mt-4 px-4 py-2.5 rounded-xl text-[13px] font-semibold bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white transition-colors flex items-center gap-2"
+              >
+                <RotateCcw className="w-4 h-4 text-[#D93800]" />
+                <span>Inspect iPhone 18 Pro Max Burgundy 3D</span>
+              </button>
             </div>
           </div>
         </section>
@@ -324,7 +341,7 @@ export default function BhanuDeveloperPortfolio() {
         <section
           id="bigbang"
           data-sc-act="case-study"
-          className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
+          className="scroll-mt-24 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
         >
           <div className="p-8 sm:p-12 lg:p-16 rounded-2xl bg-[#121318] space-y-12">
             
@@ -440,6 +457,18 @@ export default function BhanuDeveloperPortfolio() {
                 <p className="text-sm text-[#A2A3B0] pt-1">
                   Screens: Brand Collaborations Hub, Social OAuth Analytics Pipeline, and Automated DigiLocker KYC settlement.
                 </p>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelected3DScreen('bigbang');
+                    setIs3DModalOpen(true);
+                  }}
+                  className="w-full py-2.5 px-3 rounded-lg text-[13px] font-semibold bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white transition-colors flex items-center justify-center gap-2"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-[#D93800]" />
+                  <span>Inspect BigBang.Social on iPhone 18 Pro Max 3D</span>
+                </button>
               </div>
             </div>
           </div>
@@ -449,7 +478,7 @@ export default function BhanuDeveloperPortfolio() {
         <section
           id="under25"
           data-sc-act="case-study"
-          className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
+          className="scroll-mt-24 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
         >
           <div className="p-8 sm:p-12 lg:p-16 rounded-2xl bg-[#121318] space-y-12">
             
@@ -487,10 +516,51 @@ export default function BhanuDeveloperPortfolio() {
               </div>
             </div>
 
-            {/* Architecture Highlights & Verified Outcomes Grid */}
+            {/* Architecture Highlights: Inverted Grid (Screens Left, Deep Concurrency Right) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               
-              {/* Left Column: Systems Engineering Details */}
+              {/* Left Column: 3 Verified Screenshots with 3D Inspector Trigger */}
+              <div className="lg:col-span-5 space-y-4">
+                <div className="text-base font-semibold text-white flex items-center justify-between">
+                  <span>Student App Screens</span>
+                  <span className="text-sm text-[#A2A3B0]">Tap image to inspect full-res</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  {MOBILE_APPS[1].screens.map((screen, idx) => (
+                    <button
+                      key={screen.id}
+                      type="button"
+                      onClick={() => openLightbox(MOBILE_APPS[1].screens, idx)}
+                      className="group rounded-xl overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]"
+                    >
+                      <img
+                        src={screen.url}
+                        alt={screen.label}
+                        className="w-full aspect-[442/960] object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <p className="text-sm text-[#A2A3B0] pt-1">
+                  Screens: Student Gigs Feed, 200ms Real-Time Campus Spaces, and Interactive Collectibles Wallet.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelected3DScreen('under25');
+                    setIs3DModalOpen(true);
+                  }}
+                  className="w-full py-2.5 px-3 rounded-lg text-[13px] font-semibold bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white transition-colors flex items-center justify-center gap-2"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-[#10B981]" />
+                  <span>Inspect Under 25 on iPhone 18 Pro Max 3D</span>
+                </button>
+              </div>
+
+              {/* Right Column: Systems Engineering Details */}
               <div className="lg:col-span-7 space-y-6">
                 <h3 className="text-xl sm:text-2xl font-bold text-white font-display">
                   Core Engineering Contributions
@@ -537,35 +607,6 @@ export default function BhanuDeveloperPortfolio() {
                   ))}
                 </div>
               </div>
-
-              {/* Right Column: 3 Verified Screenshots with Lightbox Trigger */}
-              <div className="lg:col-span-5 space-y-4">
-                <div className="text-base font-semibold text-white flex items-center justify-between">
-                  <span>Student App Screens</span>
-                  <span className="text-sm text-[#A2A3B0]">Tap image to inspect full-res</span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-3">
-                  {MOBILE_APPS[1].screens.map((screen, idx) => (
-                    <button
-                      key={screen.id}
-                      type="button"
-                      onClick={() => openLightbox(MOBILE_APPS[1].screens, idx)}
-                      className="group rounded-xl overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]"
-                    >
-                      <img
-                        src={screen.url}
-                        alt={screen.label}
-                        className="w-full aspect-[442/960] object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </button>
-                  ))}
-                </div>
-
-                <p className="text-sm text-[#A2A3B0] pt-1">
-                  Screens: Student Gigs Feed, 200ms Real-Time Campus Spaces, and Interactive Collectibles Wallet.
-                </p>
-              </div>
             </div>
           </div>
         </section>
@@ -574,7 +615,7 @@ export default function BhanuDeveloperPortfolio() {
         <section
           id="architecture"
           data-sc-act="curtain-reveal"
-          className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
+          className="scroll-mt-24 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
         >
           <div className="space-y-8">
             <div>
@@ -673,7 +714,7 @@ export default function BhanuDeveloperPortfolio() {
         <section
           id="sarvam"
           data-sc-act="interactive-stage"
-          className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-16 sc-enter"
+          className="scroll-mt-24 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-16 sc-enter"
         >
           <div className="space-y-8">
             
@@ -806,7 +847,7 @@ export default function BhanuDeveloperPortfolio() {
         <section
           id="opensource"
           data-sc-act="panoramic-flow"
-          className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
+          className="scroll-mt-24 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
         >
           <div className="space-y-8">
             <div>
@@ -934,7 +975,7 @@ export default function BhanuDeveloperPortfolio() {
         <section
           id="contact"
           data-sc-act="monument-resolve"
-          className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pb-24 sc-enter"
+          className="scroll-mt-24 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pb-24 sc-enter"
         >
           <div className="p-8 sm:p-14 lg:p-20 rounded-2xl bg-[#121318] space-y-10">
             <div className="space-y-4 max-w-3xl">
@@ -1021,6 +1062,13 @@ export default function BhanuDeveloperPortfolio() {
         images={lightboxImages}
         currentIndex={lightboxIndex}
         onNavigate={setLightboxIndex}
+      />
+
+      {/* 12. 3D IPHONE HARDWARE INSPECTOR MODAL */}
+      <IPhone3DModal
+        isOpen={is3DModalOpen}
+        onClose={() => setIs3DModalOpen(false)}
+        initialScreen={selected3DScreen}
       />
     </div>
   );

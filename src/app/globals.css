@@ -29,6 +29,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
   background-color: var(--bg-dark);
   color: var(--text-primary);
   -webkit-text-size-adjust: 100%;
