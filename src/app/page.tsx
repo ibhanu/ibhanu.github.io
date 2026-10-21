@@ -9,12 +9,14 @@ import {
 import { ChronographWorld3D } from '@/components/three/TriptychWorld3D';
 import ResumeModal from '@/components/ResumeModal';
 import ImageLightbox from '@/components/ImageLightbox';
+import StickyScrollShowcase from '@/components/StickyScrollShowcase';
 import { Menu, X, Maximize2 } from 'lucide-react';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
 const NAV_ITEMS = [
   { id: 'intro', label: 'Intro' },
+  { id: 'showcase-rail', label: 'Showcase' },
   { id: 'bigbang', label: 'BigBang.Social' },
   { id: 'under25', label: 'Under 25' },
   { id: 'opensource', label: 'Open Source' },
@@ -448,7 +450,12 @@ export default function BhanuDeveloperPortfolio() {
         </section>
 
         {/* ===================================================================
-            ACT II: BIGBANG.SOCIAL (Scrollcraft Device: Pinned Stage + Screen Switcher)
+            ACT II: PINNED HORIZONTAL HARDWARE SHOWCASE (Scrollcraft Device: data-sc-act="pan")
+            =================================================================== */}
+        <StickyScrollShowcase />
+
+        {/* ===================================================================
+            ACT III: BIGBANG.SOCIAL (Scrollcraft Device: Pinned Stage + Screen Switcher)
             =================================================================== */}
         <section
           id="bigbang"

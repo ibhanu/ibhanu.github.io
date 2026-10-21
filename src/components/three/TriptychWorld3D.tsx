@@ -212,41 +212,155 @@ function PhoneHandset3D({
 
   return (
     <group position={position} rotation={rotation} scale={scale}>
-      {/* Brushed Aluminum / Dark Slate Body */}
-      <RoundedBox args={[2.08, 4.28, 0.16]} radius={0.22} smoothness={4}>
+      {/* 1. Grade 5 Titanium Outer Chassis (Black / Natural Titanium Finish) */}
+      <RoundedBox args={[2.08, 4.28, 0.17]} radius={0.24} smoothness={5}>
         <meshStandardMaterial
-          color="#171B24"
-          metalness={0.82}
-          roughness={0.26}
+          color="#1A1C22"
+          metalness={0.92}
+          roughness={0.28}
         />
       </RoundedBox>
 
-      {/* Subtle Rim Accent */}
-      <RoundedBox args={[2.11, 4.31, 0.12]} radius={0.23} smoothness={3}>
+      {/* 2. Titanium Chamfered Bezel Accent Glow */}
+      <RoundedBox args={[2.095, 4.295, 0.13]} radius={0.24} smoothness={4}>
         <meshStandardMaterial
           color={accentColor}
-          metalness={0.65}
+          metalness={0.75}
           roughness={0.35}
+          emissive={accentColor}
+          emissiveIntensity={0.08}
         />
       </RoundedBox>
 
-      {/* Inner Black Bezel */}
-      <mesh position={[0, 0, 0.082]}>
-        <planeGeometry args={[1.94, 4.12]} />
+      {/* 3. Back Matte Frosted Glass Plate */}
+      <mesh position={[0, 0, -0.086]}>
+        <planeGeometry args={[1.96, 4.16]} />
+        <meshStandardMaterial
+          color="#101217"
+          metalness={0.4}
+          roughness={0.65}
+        />
+      </mesh>
+
+      {/* 4. Iconic iPhone 15 Pro Triple Camera Module (Back Plateau) */}
+      <group position={[-0.42, 1.32, -0.096]}>
+        {/* Raised Glass Camera Plateau */}
+        <RoundedBox args={[0.96, 0.98, 0.05]} radius={0.18} smoothness={4}>
+          <meshStandardMaterial
+            color="#181A22"
+            metalness={0.5}
+            roughness={0.4}
+          />
+        </RoundedBox>
+
+        {/* Top-Left Lens Ring (Main 48MP) */}
+        <mesh position={[-0.22, 0.22, -0.035]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.18, 0.18, 0.04, 32]} />
+          <meshStandardMaterial color="#2B2D36" metalness={0.9} roughness={0.2} />
+        </mesh>
+        <mesh position={[-0.22, 0.22, -0.058]}>
+          <circleGeometry args={[0.13, 32]} />
+          <meshBasicMaterial color="#05060A" />
+        </mesh>
+
+        {/* Bottom-Left Lens Ring (Ultra-Wide) */}
+        <mesh position={[-0.22, -0.22, -0.035]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.18, 0.18, 0.04, 32]} />
+          <meshStandardMaterial color="#2B2D36" metalness={0.9} roughness={0.2} />
+        </mesh>
+        <mesh position={[-0.22, -0.22, -0.058]}>
+          <circleGeometry args={[0.13, 32]} />
+          <meshBasicMaterial color="#05060A" />
+        </mesh>
+
+        {/* Right Lens Ring (Telephoto 5x Periscope) */}
+        <mesh position={[0.22, 0, -0.035]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.18, 0.18, 0.04, 32]} />
+          <meshStandardMaterial color="#2B2D36" metalness={0.9} roughness={0.2} />
+        </mesh>
+        <mesh position={[0.22, 0, -0.058]}>
+          <circleGeometry args={[0.13, 32]} />
+          <meshBasicMaterial color="#05060A" />
+        </mesh>
+
+        {/* LiDAR Sensor */}
+        <mesh position={[0.22, -0.28, -0.028]}>
+          <circleGeometry args={[0.065, 24]} />
+          <meshBasicMaterial color="#0B0D12" />
+        </mesh>
+
+        {/* True Tone Dual Flash */}
+        <mesh position={[0.22, 0.28, -0.028]}>
+          <circleGeometry args={[0.075, 24]} />
+          <meshStandardMaterial
+            color="#FAF0D8"
+            metalness={0.1}
+            roughness={0.5}
+            emissive="#FFF4D0"
+            emissiveIntensity={0.2}
+          />
+        </mesh>
+      </group>
+
+      {/* 5. Physical Side Buttons */}
+      {/* Left Side: Action Button */}
+      <mesh position={[-1.055, 1.15, 0]}>
+        <boxGeometry args={[0.03, 0.18, 0.05]} />
+        <meshStandardMaterial color="#2A2C34" metalness={0.9} roughness={0.25} />
+      </mesh>
+      {/* Left Side: Volume Up */}
+      <mesh position={[-1.055, 0.72, 0]}>
+        <boxGeometry args={[0.03, 0.28, 0.05]} />
+        <meshStandardMaterial color="#2A2C34" metalness={0.9} roughness={0.25} />
+      </mesh>
+      {/* Left Side: Volume Down */}
+      <mesh position={[-1.055, 0.32, 0]}>
+        <boxGeometry args={[0.03, 0.28, 0.05]} />
+        <meshStandardMaterial color="#2A2C34" metalness={0.9} roughness={0.25} />
+      </mesh>
+      {/* Right Side: Power Button */}
+      <mesh position={[1.055, 0.65, 0]}>
+        <boxGeometry args={[0.03, 0.44, 0.05]} />
+        <meshStandardMaterial color="#2A2C34" metalness={0.9} roughness={0.25} />
+      </mesh>
+
+      {/* Bottom: USB-C Port & Stereo Speaker Cutouts */}
+      <mesh position={[0, -2.145, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <boxGeometry args={[0.03, 0.26, 0.07]} />
+        <meshBasicMaterial color="#050608" />
+      </mesh>
+      <mesh position={[-0.45, -2.145, 0]}>
+        <boxGeometry args={[0.24, 0.02, 0.04]} />
+        <meshBasicMaterial color="#050608" />
+      </mesh>
+      <mesh position={[0.45, -2.145, 0]}>
+        <boxGeometry args={[0.24, 0.02, 0.04]} />
         <meshBasicMaterial color="#050608" />
       </mesh>
 
-      {/* Real App Store / Product Screenshot Display */}
+      {/* 6. Front Display: Ceramic Shield Glass & Razor-Thin Bezel */}
       <mesh position={[0, 0, 0.086]}>
-        <planeGeometry args={[1.88, 4.02]} />
+        <planeGeometry args={[1.96, 4.16]} />
+        <meshBasicMaterial color="#030406" />
+      </mesh>
+
+      {/* Real Screen Screenshot Texture (19.5:9 Display Ratio) */}
+      <mesh position={[0, 0, 0.088]}>
+        <planeGeometry args={[1.90, 4.08]} />
         <meshBasicMaterial map={activeTex} toneMapped={false} />
       </mesh>
 
-      {/* Top Speaker / Dynamic Island Pill */}
-      <mesh position={[0, 1.88, 0.09]}>
-        <planeGeometry args={[0.48, 0.11]} />
-        <meshBasicMaterial color="#050608" />
-      </mesh>
+      {/* 7. Dynamic Island (Authentic Pill with Camera & Sensor Elements) */}
+      <group position={[0, 1.84, 0.091]}>
+        <RoundedBox args={[0.54, 0.14, 0.005]} radius={0.06} smoothness={3}>
+          <meshBasicMaterial color="#000000" />
+        </RoundedBox>
+        {/* Subtle FaceTime Front Camera Lens Dot */}
+        <mesh position={[0.13, 0, 0.004]}>
+          <circleGeometry args={[0.028, 16]} />
+          <meshBasicMaterial color="#0D1628" />
+        </mesh>
+      </group>
     </group>
   );
 }
