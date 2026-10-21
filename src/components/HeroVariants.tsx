@@ -12,7 +12,7 @@ interface HeroVariantsProps {
 export type HeroDirection = 'dimensional' | 'triptych' | 'spec';
 
 export default function HeroVariants({ onOpenResume }: HeroVariantsProps) {
-  const [variant, setVariant] = useState<HeroDirection>('dimensional');
+  const [variant, setVariant] = useState<HeroDirection>('triptych');
   const [activeTriptych, setActiveTriptych] = useState<number>(1);
   const [selectedLayer, setSelectedLayer] = useState<number>(0);
 
@@ -139,19 +139,12 @@ export default function HeroVariants({ onOpenResume }: HeroVariantsProps) {
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
             {/* Left Column: Monumental Title & Datum Strip */}
             <div className="lg:col-span-7 space-y-6">
-              {/* Coordinates Header Tag */}
-              <div className="flex items-center gap-3 text-sm text-[#A2A3B0] font-medium">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
-                <span>Staff Mobile &amp; Systems Engineering Leadership</span>
-                <span className="text-[#A2A3B0] hidden sm:inline">12.9716° N, 77.5946° E</span>
-              </div>
-
               <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-[#F5F5F7] leading-[0.95] font-display uppercase">
                 Mobile Systems at 900K+ Scale
               </h1>
 
               <p className="text-base sm:text-lg text-[#E0E0E6] leading-relaxed max-w-2xl">
-                Engineering creator monetization engines, 200ms background isolate pipelines,
+                Staff mobile systems architect directing creator monetization engines, 200ms background isolate pipelines,
                 and multi-platform Indic speech SDKs from Bengaluru, India.
               </p>
 
@@ -236,64 +229,19 @@ export default function HeroVariants({ onOpenResume }: HeroVariantsProps) {
       )}
 
       {/* ======================================================== */}
-      {/* DIRECTION 2: MULTI-APP PRODUCTION TRIPTYCH              */}
+      {/* DIRECTION 2: MULTI-APP PRODUCTION TRIPTYCH (STREAMLINED) */}
       {/* ======================================================== */}
       {variant === 'triptych' && (
         <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-          {/* Left Column: Multi-Platform Authority Narrative */}
+          {/* Left Column: Focused Authority Narrative & Datum Strip */}
           <div className="lg:col-span-6 space-y-6">
-            <div className="flex items-center gap-3 text-sm text-[#A2A3B0] font-medium">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FF5520]" />
-              <span>Multi-Platform Production Triptych</span>
-              <span className="text-[#A2A3B0] hidden sm:inline">3 Shipped Systems</span>
-            </div>
-
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-[#F5F5F7] leading-[0.95] font-display uppercase">
-              3 Production Platforms at Scale
+              Mobile Systems at 900K+ Scale
             </h1>
 
-            <p className="text-base sm:text-lg text-[#E0E0E6] leading-relaxed max-w-2xl">
-              From Collective Artists Network creator fintech to Under 25 student social feeds and Sarvam AI
-              Indic speech pipelines: architecture spanning millions of events daily.
+            <p className="text-base sm:text-lg text-[#E0E0E6] leading-relaxed max-w-xl">
+              Staff mobile systems architect directing creator monetization, real-time campus networks, and Indic AI speech pipelines from Bengaluru, India.
             </p>
-
-            {/* Quick System Switcher Tabs */}
-            <div className="space-y-2 pt-1">
-              <div className="text-[13px] font-semibold text-[#A2A3B0] uppercase tracking-wider">
-                Select Platform to Focus:
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {triptychApps.map((app, idx) => {
-                  const isActive = activeTriptych === idx;
-                  return (
-                    <button
-                      key={app.id}
-                      type="button"
-                      onClick={() => setActiveTriptych(idx)}
-                      className={`p-3 rounded-xl text-left transition-[background-color,border-color] duration-150 border ${
-                        isActive
-                          ? 'bg-[#1A1C27] border-[#D93800] text-white'
-                          : 'bg-[#12131A] border-[#202230] text-[#9A9BA8] hover:text-white'
-                      }`}
-                    >
-                      <div className="text-sm font-bold truncate">{app.name}</div>
-                      <div className="text-xs text-[#A2A3B0] mt-0.5 truncate">{app.role}</div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Focused App Context Note */}
-            <div className="p-4 rounded-xl bg-[#14151E] border border-[#222432] space-y-1">
-              <div className="text-sm font-semibold text-white">
-                {triptychApps[activeTriptych].name} Platform Focus
-              </div>
-              <p className="text-base text-[#D1D1DB] leading-relaxed">
-                Metric: <span className="text-[#FF5520] font-semibold">{triptychApps[activeTriptych].metric}</span>.
-                Tap any handset on the right to bring it into the center focal plane.
-              </p>
-            </div>
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-3 pt-1">
@@ -301,24 +249,45 @@ export default function HeroVariants({ onOpenResume }: HeroVariantsProps) {
                 href="#showcase-rail"
                 className="px-6 py-3 rounded-lg text-base font-semibold bg-[#D93800] text-white hover:bg-[#B82F00] transition-[background-color] duration-150"
               >
-                Explore Full Case Studies
+                Inspect Shipped Systems
               </a>
               <button
                 onClick={onOpenResume}
                 type="button"
                 className="px-5 py-3 rounded-lg text-base font-semibold bg-[#161822] text-[#F5F5F7] hover:bg-[#202230] transition-[background-color] duration-150"
               >
-                Credentials (PDF)
+                Verified Credentials (PDF)
               </button>
+            </div>
+
+            {/* Editorial Telemetry Datum Line */}
+            <div data-ui="telemetry-strip" className="pt-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                <div className="space-y-1">
+                  <div className="text-3xl sm:text-4xl font-bold text-white font-display">900K+</div>
+                  <div className="text-[13px] text-[#A2A3B0]">Store Downloads</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-3xl sm:text-4xl font-bold text-[#FF5520] font-display">$25M+</div>
+                  <div className="text-[13px] text-[#A2A3B0]">Platform Volume</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-3xl sm:text-4xl font-bold text-[#10B981] font-display">200ms</div>
+                  <div className="text-[13px] text-[#A2A3B0]">Socket Latency</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-3xl sm:text-4xl font-bold text-[#F59E0B] font-display">65%</div>
+                  <div className="text-[13px] text-[#A2A3B0]">Crash Reduction</div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Right Column: 3-Device Fanned Perspective Triptych */}
-          <div className="lg:col-span-6 flex items-center justify-center relative min-h-[480px]">
-            <div className="relative w-full max-w-[440px] flex items-center justify-center h-[520px]">
+          <div className="lg:col-span-6 flex flex-col items-center justify-center relative min-h-[480px]">
+            <div className="relative w-full max-w-[440px] flex items-center justify-center h-[490px]">
               {triptychApps.map((app, idx) => {
                 const isActive = activeTriptych === idx;
-                // Calculate position offsets based on index
                 let transformStyle = '';
                 let zIndex = 10;
                 let opacity = 'opacity-65';
@@ -349,7 +318,7 @@ export default function HeroVariants({ onOpenResume }: HeroVariantsProps) {
                   <div
                     key={app.id}
                     onClick={() => setActiveTriptych(idx)}
-                    className={`absolute top-4 w-[210px] sm:w-[230px] cursor-pointer transition-[transform,opacity] duration-300 ${transformStyle} ${opacity}`}
+                    className={`absolute top-2 w-[210px] sm:w-[230px] cursor-pointer transition-[transform,opacity] duration-300 ${transformStyle} ${opacity}`}
                     style={{ zIndex }}
                   >
                     <div className="relative">
@@ -358,15 +327,19 @@ export default function HeroVariants({ onOpenResume }: HeroVariantsProps) {
                         alt={app.alt}
                         className="w-full"
                       />
-                      <div className="mt-2 text-center">
-                        <span className="inline-block px-2.5 py-1 rounded-md text-xs font-semibold bg-[#14151D] text-white border border-[#222430]">
-                          {app.name}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 );
               })}
+            </div>
+
+            {/* Active Platform Telemetry Indicator */}
+            <div className="w-full max-w-[340px] mt-2 flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#14151D] border border-[#222430]">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: triptychApps[activeTriptych].color }} />
+                <span className="text-[13px] font-semibold text-white">{triptychApps[activeTriptych].name}</span>
+              </div>
+              <span className="text-[13px] text-[#A2A3B0] font-medium">{triptychApps[activeTriptych].metric}</span>
             </div>
           </div>
         </div>
@@ -379,18 +352,12 @@ export default function HeroVariants({ onOpenResume }: HeroVariantsProps) {
         <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           {/* Left Column: Technical Invariants & Spec Sheet */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="flex items-center gap-3 text-sm text-[#A2A3B0]">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
-              <span className="font-semibold">MOBILE SYSTEMS KERNEL</span>
-              <span className="text-[#A2A3B0]">REV 2026</span>
-            </div>
-
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-[#F5F5F7] leading-[0.95] font-display uppercase">
               High-Performance Mobile Infrastructure
             </h1>
 
             <p className="text-base sm:text-lg text-[#E0E0E6] leading-relaxed max-w-2xl">
-              Architectural leadership bridging Flutter reactive frameworks down to native iOS Swift and Android NDK silicon.
+              Staff systems architecture bridging Flutter reactive frameworks down to native iOS Swift and Android NDK silicon.
             </p>
 
             {/* Core Invariants Spec Block */}

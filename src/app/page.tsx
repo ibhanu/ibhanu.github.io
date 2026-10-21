@@ -662,7 +662,7 @@ export default function BhanuDeveloperPortfolio() {
           id="architecture"
           ref={archRef}
           data-sc-act="curtain-reveal"
-          className="scroll-mt-24 relative w-full lg:min-h-[260vh]"
+          className="scroll-mt-24 relative w-full lg:min-h-[200vh]"
         >
           <div className="lg:sticky lg:top-0 min-h-[100dvh] flex flex-col justify-center max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-6 lg:py-10">
             <div className="space-y-6">
@@ -756,7 +756,7 @@ export default function BhanuDeveloperPortfolio() {
                       <div className="text-[13px] text-[#A2A3B0] font-semibold">
                         Engineered Mechanism
                       </div>
-                      <p className="text-sm text-[#E0E0E6] leading-relaxed">
+                      <p className="text-base text-[#E0E0E6] leading-relaxed">
                         {currentLayer.details[0]}
                       </p>
                     </div>
@@ -765,7 +765,7 @@ export default function BhanuDeveloperPortfolio() {
                       <div className="text-[13px] text-[#A2A3B0] font-semibold">
                         Memory &amp; Frame Invariant
                       </div>
-                      <p className="text-sm text-[#E0E0E6] leading-relaxed">
+                      <p className="text-base text-[#E0E0E6] leading-relaxed">
                         {currentLayer.details[1]}
                       </p>
                     </div>
