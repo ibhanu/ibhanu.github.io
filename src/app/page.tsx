@@ -1,43 +1,44 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   PROFILE_DATA,
   MOBILE_APPS,
   SARVAM_SDK_TABS,
+  ARCHITECTURE_LAYERS,
 } from '@/data/portfolioData';
-import { ChronographWorld3D } from '@/components/three/TriptychWorld3D';
 import ResumeModal from '@/components/ResumeModal';
 import ImageLightbox from '@/components/ImageLightbox';
 import StickyScrollShowcase from '@/components/StickyScrollShowcase';
-import { Menu, X, Maximize2, Copy, Check, Activity, Terminal } from 'lucide-react';
-
-const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-
-const NAV_ITEMS = [
-  { id: 'intro', label: 'Intro' },
-  { id: 'showcase-rail', label: 'Showcase' },
-  { id: 'bigbang', label: 'BigBang.Social' },
-  { id: 'under25', label: 'Under 25' },
-  { id: 'opensource', label: 'Open Source' },
-  { id: 'sdks', label: 'SDKs & Backend' },
-  { id: 'contact', label: 'Contact' },
-];
+import IPhoneMockup from '@/components/IPhoneMockup';
+import {
+  Menu,
+  X,
+  Copy,
+  Check,
+  Terminal,
+  ExternalLink,
+  ArrowRight,
+} from 'lucide-react';
 
 export default function BhanuDeveloperPortfolio() {
-  const scrollProgressRef = useRef(0);
-  const activeSectionRef = useRef('intro');
-  const pointerRef = useRef({ x: 0, y: 0 });
-
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [activeSection, setActiveSection] = useState('intro');
   const [selectedSdkTab, setSelectedSdkTab] = useState(0);
+  const [activeArchLayer, setActiveArchLayer] = useState(0);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
-  const [orbitMode, setOrbitMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
-  const [benchmarkRunning, setBenchmarkRunning] = useState(false);
-  const [benchmarkChunks, setBenchmarkChunks] = useState(0);
+  const [copiedEmail, setCopiedEmail] = useState(false);
+  
+  // Lightbox state
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState<{ url: string; label: string; caption?: string }[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const openLightbox = (images: { url: string; label: string; caption?: string }[], index: number = 0) => {
+    setLightboxImages(images);
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
 
   const copyCodeToClipboard = (text: string) => {
     if (typeof navigator !== 'undefined') {
@@ -47,387 +48,942 @@ export default function BhanuDeveloperPortfolio() {
     }
   };
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (benchmarkRunning) {
-      timer = setInterval(() => {
-        setBenchmarkChunks((prev) => (prev + 1) % 100);
-      }, 120);
+  const copyEmailToClipboard = () => {
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(PROFILE_DATA.email);
+      setCopiedEmail(true);
+      setTimeout(() => setCopiedEmail(false), 2000);
     }
-    return () => clearInterval(timer);
-  }, [benchmarkRunning]);
-
-  // Screenshot lightbox state for full-screen touch inspection
-  const [lightboxState, setLightboxState] = useState<{
-    isOpen: boolean;
-    images: { url: string; label: string; caption?: string }[];
-    index: number;
-  }>({
-    isOpen: false,
-    images: [],
-    index: 0,
-  });
-
-  const openLightbox = (
-    images: { url: string; label: string; caption?: string }[],
-    index: number = 0
-  ) => {
-    setLightboxState({ isOpen: true, images, index });
   };
 
-  // Manual screen overrides when the user clicks a screen pill or hovers
-  const [screenOverrides, setScreenOverrides] = useState<Record<string, number>>({});
-
-  // Scrollcraft Engine: tracks normalized scroll progress, active DOM section, and velocity
-  useEffect(() => {
-    let raf = 0;
-    let lastScrollY = window.scrollY;
-    let lastTime = performance.now();
-
-    const updateScrollEngine = () => {
-      raf = 0;
-      const now = performance.now();
-      const dt = Math.max(1, now - lastTime);
-      const currentY = window.scrollY;
-      const velocity = Math.min(1, Math.abs(currentY - lastScrollY) / (dt * 2.5));
-      lastScrollY = currentY;
-      lastTime = now;
-
-      const maxScroll = Math.max(
-        1,
-        document.documentElement.scrollHeight - window.innerHeight
-      );
-      const p = clamp01(currentY / maxScroll);
-      scrollProgressRef.current = p;
-      setScrollProgress(p);
-
-      document.documentElement.style.setProperty('--sc-p', p.toFixed(4));
-      document.documentElement.style.setProperty('--sc-v', velocity.toFixed(3));
-
-      // Determine active section by actual viewport center
-      const probeY = window.innerHeight * 0.38;
-      let currentSec = 'intro';
-      for (const item of NAV_ITEMS) {
-        const el = document.getElementById(item.id);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= probeY) {
-            currentSec = item.id;
-          }
-        }
-      }
-      activeSectionRef.current = currentSec;
-      setActiveSection(currentSec);
-    };
-
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(updateScrollEngine);
-    };
-
-    const onPointerMove = (e: PointerEvent) => {
-      pointerRef.current.x = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
-      pointerRef.current.y = -((e.clientY / Math.max(1, window.innerHeight)) * 2 - 1);
-    };
-
-    updateScrollEngine();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    window.addEventListener('pointermove', onPointerMove, { passive: true });
-
-    return () => {
-      if (raf) cancelAnimationFrame(raf);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-      window.removeEventListener('pointermove', onPointerMove);
-    };
-  }, []);
-
-  const bigbangApp = MOBILE_APPS[0];
-  const under25App = MOBILE_APPS[1];
-  const auraApp = MOBILE_APPS[2];
-  const mangoApp = MOBILE_APPS[3];
-  const activeSdk = SARVAM_SDK_TABS[selectedSdkTab] || SARVAM_SDK_TABS[0];
-
-  // Auto-calculated active screen index for BigBang & Under25 based on scroll if not overridden
-  const bbActiveScreen =
-    screenOverrides.bigbang !== undefined
-      ? screenOverrides.bigbang
-      : scrollProgress < 0.22
-      ? 0
-      : scrollProgress < 0.28
-      ? 1
-      : 2;
-
-  const u25ActiveScreen =
-    screenOverrides.under25 !== undefined
-      ? screenOverrides.under25
-      : scrollProgress < 0.42
-      ? 0
-      : scrollProgress < 0.48
-      ? 1
-      : 2;
-
-  const auraActiveScreen = screenOverrides.aura ?? 0;
-  const mangoActiveScreen = screenOverrides.mango ?? 0;
-
-  const isPaperGround = activeSection === 'sdks';
+  const currentTab = SARVAM_SDK_TABS[selectedSdkTab] || SARVAM_SDK_TABS[0];
+  const currentLayer = ARCHITECTURE_LAYERS[activeArchLayer] || ARCHITECTURE_LAYERS[0];
 
   return (
-    <div
-      className={`relative min-h-screen overflow-x-hidden transition-colors duration-500 ${
-        isPaperGround
-          ? 'bg-[#F4F0EA]/90 text-[#111318]'
-          : 'bg-transparent text-[#F4F0EA]'
-      }`}
-    >
-      {/* Delicate Analog Noise Grain Texture for Tactile Depth */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.025] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:24px_24px] z-30"
-        aria-hidden="true"
-      />
-
-      {/* 3D WebGL Product Stage (Fixed Behind Story Content) */}
-      <ChronographWorld3D
-        scrollProgressRef={scrollProgressRef}
-        activeSectionRef={activeSectionRef}
-        pointerRef={pointerRef}
-        activeScreenOverrides={screenOverrides}
-        orbitMode={orbitMode}
-      />
-
-      {/* TOP NAVIGATION BAR */}
-      <header
-        className={`fixed top-0 inset-x-0 z-40 border-b backdrop-blur-md transition-colors duration-300 ${
-          isPaperGround
-            ? 'bg-[#F4F0EA]/95 border-[#111318]/10 text-[#111318]'
-            : 'bg-[#07080B]/90 border-[#F4F0EA]/10 text-[#F4F0EA]'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-2">
+    <div className="relative min-h-[100dvh] bg-[#0A0A0D] text-[#F5F5F7] selection:bg-[#D93800] selection:text-white">
+      
+      {/* 1. TOP NAVIGATION BAR */}
+      <header className="fixed top-0 inset-x-0 z-40 bg-[#0A0A0D]/95">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 h-20 flex items-center justify-between">
+          
+          {/* Brand & Coordinates */}
           <a
-            href="#intro"
-            className="flex items-center gap-2 font-semibold tracking-tight text-sm sm:text-base min-h-[44px]"
+            href="#top"
+            className="flex items-center gap-3.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D93800] rounded-lg"
           >
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#FF4F1F] flex-shrink-0" />
-            <span className="truncate">Bhanu Pratap</span>
-            <span
-              className={`hidden sm:inline font-mono text-xs ${
-                isPaperGround ? 'text-[#111318]/60' : 'text-[#9DA4B0]'
-              }`}
-            >
-              Bengaluru, India
-            </span>
+            <span className="w-3 h-3 rounded-full bg-[#D93800]" />
+            <div>
+              <span className="text-xl font-bold tracking-tight text-white font-display uppercase block">
+                Bhanu Pratap
+              </span>
+              <span className="text-[13px] text-[#A2A3B0] block">
+                Bengaluru, India
+              </span>
+            </div>
           </a>
 
-          {/* DESKTOP NAVIGATION */}
-          <nav
-            aria-label="Portfolio sections"
-            className="hidden md:flex items-center gap-1"
-          >
-            {NAV_ITEMS.map((item) => {
-              const isActive = activeSection === item.id;
-              return (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className={`px-3 py-1.5 rounded-md text-xs font-mono transition-colors ${
-                    isActive
-                      ? 'bg-[#FF4F1F] text-[#F4F0EA] font-medium'
-                      : isPaperGround
-                      ? 'text-[#111318]/70 hover:text-[#111318]'
-                      : 'text-[#9DA4B0] hover:text-[#F4F0EA]'
-                  }`}
-                >
-                  {item.label}
-                </a>
-              );
-            })}
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-[#E0E0E6]" aria-label="Main">
+            <a href="#showcase-rail" className="hover:text-white transition-colors">
+              Production Showcase
+            </a>
+            <a href="#bigbang" className="hover:text-white transition-colors">
+              BigBang.Social
+            </a>
+            <a href="#under25" className="hover:text-white transition-colors">
+              Under 25
+            </a>
+            <a href="#architecture" className="hover:text-white transition-colors">
+              Systems Architecture
+            </a>
+            <a href="#sarvam" className="hover:text-white transition-colors">
+              Sarvam AI SDKs
+            </a>
+            <a href="#opensource" className="hover:text-white transition-colors">
+              Consumer Craft
+            </a>
+            <a href="#contact" className="hover:text-white transition-colors">
+              Contact
+            </a>
           </nav>
 
-          {/* ACTIONS & MOBILE MENU TOGGLE */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Right Action Buttons */}
+          <div className="hidden sm:flex items-center gap-3">
             <button
-              type="button"
               onClick={() => setIsResumeOpen(true)}
-              className={`px-2.5 sm:px-3 py-1.5 min-h-[40px] sm:min-h-[44px] flex items-center rounded-lg font-mono text-xs border transition-colors ${
-                isPaperGround
-                  ? 'border-[#111318]/20 text-[#111318] hover:bg-[#111318]/5 active:bg-[#111318]/10'
-                  : 'border-[#F4F0EA]/20 text-[#F4F0EA] hover:bg-[#F4F0EA]/10 active:bg-[#F4F0EA]/20'
-              }`}
+              type="button"
+              className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#181920] text-[#F5F5F7] hover:bg-[#22232D] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D93800]"
             >
-              Resume
+              Verified Credentials
             </button>
             <a
               href={`mailto:${PROFILE_DATA.email}`}
-              className="hidden sm:inline-flex items-center px-3.5 py-2 min-h-[44px] rounded-lg font-mono text-xs font-medium bg-[#FF4F1F] text-[#F4F0EA] hover:bg-[#e04318] active:bg-[#cc3912] transition-colors"
+              className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#D93800] text-white hover:bg-[#B82F00] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D93800]"
             >
-              Email Me
+              Direct Inquiries
             </a>
-            {/* MOBILE HAMBURGER BUTTON */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-              aria-expanded={mobileMenuOpen}
-              className={`md:hidden p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg border transition-colors ${
-                isPaperGround
-                  ? 'border-[#111318]/20 text-[#111318] hover:bg-[#111318]/5'
-                  : 'border-[#F4F0EA]/20 text-[#F4F0EA] hover:bg-[#F4F0EA]/10'
-              }`}
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
           </div>
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            type="button"
+            aria-label="Toggle navigation menu"
+            className="lg:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-[#181920] text-[#F5F5F7]"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
 
-        {/* MOBILE NAVIGATION DRAWER */}
+        {/* Mobile Dropdown Panel */}
         {mobileMenuOpen && (
-          <div
-            className={`md:hidden border-b px-4 py-4 space-y-3 backdrop-blur-xl animate-in slide-in-from-top-2 duration-200 ${
-              isPaperGround
-                ? 'bg-[#F4F0EA] border-[#111318]/10 text-[#111318]'
-                : 'bg-[#0C0E14] border-[#F4F0EA]/15 text-[#F4F0EA]'
-            }`}
-          >
-            <div className="text-[11px] font-mono text-[#9DA4B0] uppercase tracking-wider px-1">
-              Sections
-            </div>
-            <nav className="grid grid-cols-2 gap-2" aria-label="Mobile section navigation">
-              {NAV_ITEMS.map((item) => {
-                const isActive = activeSection === item.id;
-                return (
-                  <a
-                    key={item.id}
-                    href={`#${item.id}`}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`px-3 py-2.5 min-h-[44px] flex items-center rounded-lg text-xs font-mono transition-colors ${
-                      isActive
-                        ? 'bg-[#FF4F1F] text-white font-semibold'
-                        : isPaperGround
-                        ? 'bg-black/5 text-[#111318] hover:bg-black/10'
-                        : 'bg-white/5 text-[#9DA4B0] hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    {item.label}
-                  </a>
-                );
-              })}
+          <div className="lg:hidden bg-[#121318] px-6 py-5 space-y-4">
+            <nav className="flex flex-col space-y-3 text-base font-medium text-[#E0E0E6]">
+              <a
+                href="#showcase-rail"
+                onClick={() => setMobileMenuOpen(false)}
+                className="hover:text-white transition-colors py-1"
+              >
+                Production Showcase
+              </a>
+              <a
+                href="#bigbang"
+                onClick={() => setMobileMenuOpen(false)}
+                className="hover:text-white transition-colors py-1"
+              >
+                BigBang.Social
+              </a>
+              <a
+                href="#under25"
+                onClick={() => setMobileMenuOpen(false)}
+                className="hover:text-white transition-colors py-1"
+              >
+                Under 25 Universe
+              </a>
+              <a
+                href="#architecture"
+                onClick={() => setMobileMenuOpen(false)}
+                className="hover:text-white transition-colors py-1"
+              >
+                Systems Architecture
+              </a>
+              <a
+                href="#sarvam"
+                onClick={() => setMobileMenuOpen(false)}
+                className="hover:text-white transition-colors py-1"
+              >
+                Sarvam AI SDKs
+              </a>
+              <a
+                href="#opensource"
+                onClick={() => setMobileMenuOpen(false)}
+                className="hover:text-white transition-colors py-1"
+              >
+                Consumer Craft
+              </a>
+              <a
+                href="#contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="hover:text-white transition-colors py-1"
+              >
+                Contact
+              </a>
             </nav>
-            <div className="pt-2 border-t border-white/10 flex items-center gap-2">
+            <div className="pt-2 flex flex-col gap-2.5">
               <button
-                type="button"
                 onClick={() => {
                   setMobileMenuOpen(false);
                   setIsResumeOpen(true);
                 }}
-                className="flex-1 py-2.5 min-h-[44px] flex items-center justify-center rounded-lg bg-[#FF4F1F]/15 border border-[#FF4F1F]/40 text-[#FF4F1F] font-mono text-xs font-semibold"
+                type="button"
+                className="w-full text-center py-3 rounded-lg text-sm font-semibold bg-[#181920] text-[#F5F5F7]"
               >
-                View Full Resume
+                Verified Credentials
               </button>
               <a
                 href={`mailto:${PROFILE_DATA.email}`}
-                className="flex-1 py-2.5 min-h-[44px] flex items-center justify-center rounded-lg bg-[#FF4F1F] text-white font-mono text-xs font-medium"
+                className="w-full text-center py-3 rounded-lg text-sm font-semibold bg-[#D93800] text-white"
               >
-                Email Bhanu
+                Direct Inquiries
               </a>
             </div>
           </div>
         )}
       </header>
 
-      {/* MAIN SCROLL STORY */}
-      <main className="relative z-10">
-        {/* ===================================================================
-            ACT I: HERO (Scrollcraft Device: Layered Parallax Hero)
-            =================================================================== */}
-        <section
-          id="intro"
-          data-sc-parallax="hero"
-          className="min-h-screen pt-24 sm:pt-28 pb-16 sm:pb-20 flex items-center"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            <div className="lg:col-span-7 space-y-5 sm:space-y-6 bg-[#07080B]/85 lg:bg-[#07080B]/75 backdrop-blur-md p-5 sm:p-8 rounded-2xl border border-[#F4F0EA]/10">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FF4F1F]/15 border border-[#FF4F1F]/30 font-mono text-xs text-[#FF4F1F]">
-                <span className="w-2 h-2 rounded-full bg-[#FF4F1F]" />
-                <span>Senior Flutter & Mobile Engineer, 5+ Years</span>
-              </div>
+      {/* MAIN CONTENT WRAPPER */}
+      <main id="top" className="pt-24 space-y-32 md:space-y-44">
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08]">
-                I build consumer mobile apps used by hundreds of thousands of
-                people.
+        {/* 2. ACT 1: THE DIMENSIONAL MONUMENT HERO */}
+        <section
+          data-sc-act="layered-depth"
+          className="relative max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-12 md:pt-20 sc-enter"
+        >
+          {/* Coordinates Header Tag */}
+          <div className="flex items-center gap-3 text-sm text-[#A2A3B0] font-medium mb-6">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
+            <span>Staff Mobile & Systems Engineering Leadership</span>
+            <span className="text-[#A2A3B0] hidden sm:inline">12.9716° N, 77.5946° E</span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            
+            {/* Left Column: Monumental Title & Value Proposition */}
+            <div className="lg:col-span-7 space-y-7">
+              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-[#F5F5F7] leading-[0.95] font-display uppercase">
+                Mobile Systems at 900K+ Scale
               </h1>
 
-              <p className="text-sm sm:text-lg text-[#9DA4B0] max-w-[62ch] leading-relaxed">
-                I am Bhanu Pratap, a mobile engineer in Bengaluru. Over the last
-                five years I led app engineering at{' '}
-                <strong className="text-[#F4F0EA] font-medium">
-                  BigBang.Social
-                </strong>{' '}
-                (500,000+ downloads, $5M+ annual creator payouts) and{' '}
-                <strong className="text-[#F4F0EA] font-medium">Under 25</strong>{' '}
-                (400,000+ students, $20M+ platform earnings). I also build
-                open-source Flutter apps and the 4-platform mobile SDKs for{' '}
-                <strong className="text-[#F4F0EA] font-medium">
-                  Sarvam AI
-                </strong>
-                .
+              <p className="text-lg sm:text-xl text-[#E0E0E6] leading-relaxed max-w-2xl">
+                Engineering creator monetization engines, 200ms background isolate pipelines,
+                and multi-platform Indic speech SDKs from Bengaluru, India.
               </p>
 
-              {/* Concrete Numbers from Resume */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-3 border-t border-[#F4F0EA]/10">
-                <div>
-                  <div className="text-xl sm:text-3xl font-bold font-mono text-[#F4F0EA] tabular-nums">
-                    900K+
-                  </div>
-                  <div className="text-[11px] sm:text-xs font-mono text-[#9DA4B0] mt-1">
-                    Users on iOS & Android
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xl sm:text-3xl font-bold font-mono text-[#FF4F1F] tabular-nums">
-                    $25M+
-                  </div>
-                  <div className="text-[11px] sm:text-xs font-mono text-[#9DA4B0] mt-1">
-                    Creator payouts
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xl sm:text-3xl font-bold font-mono text-[#10B981] tabular-nums">
-                    2.1% → 0.7%
-                  </div>
-                  <div className="text-[11px] sm:text-xs font-mono text-[#9DA4B0] mt-1">
-                    Crash rate cut by 65%
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xl sm:text-3xl font-bold font-mono text-[#F59E0B] tabular-nums">
-                    200ms
-                  </div>
-                  <div className="text-[11px] sm:text-xs font-mono text-[#9DA4B0] mt-1">
-                    WebSocket latency
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-2">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3.5 pt-2">
                 <a
-                  href="#bigbang"
-                  className="px-4 sm:px-5 py-2.5 sm:py-3 min-h-[44px] flex items-center justify-center rounded-lg bg-[#FF4F1F] text-[#F4F0EA] font-medium text-xs sm:text-sm hover:bg-[#e04318] active:bg-[#cc3912] transition-colors"
+                  href="#showcase-rail"
+                  className="px-6 py-3.5 rounded-lg text-base font-semibold bg-[#D93800] text-white hover:bg-[#B82F00] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D93800]"
                 >
-                  See Shipped Work
+                  Inspect Shipped Systems
                 </a>
                 <button
-                  type="button"
                   onClick={() => setIsResumeOpen(true)}
-                  className="px-3.5 sm:px-4 py-2.5 sm:py-3 min-h-[44px] flex items-center justify-center rounded-lg border border-[#FF4F1F]/40 bg-[#FF4F1F]/10 text-[#FF4F1F] font-mono text-xs sm:text-sm hover:bg-[#FF4F1F]/20 active:bg-[#FF4F1F]/30 transition-colors"
+                  type="button"
+                  className="px-6 py-3.5 rounded-lg text-base font-semibold bg-[#121318] text-[#F5F5F7] hover:bg-[#1A1B22] transition-colors"
                 >
-                  View Resume (PDF)
+                  Verified Credentials (PDF)
                 </button>
                 <a
                   href={PROFILE_DATA.github}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-3 sm:px-4 py-2.5 sm:py-3 min-h-[44px] flex items-center justify-center rounded-lg border border-[#F4F0EA]/20 text-xs sm:text-sm font-mono hover:bg-[#F4F0EA]/10 transition-colors"
+                  className="px-6 py-3.5 rounded-lg text-base font-semibold bg-[#121318] text-[#F5F5F7] hover:bg-[#1A1B22] transition-colors"
+                >
+                  GitHub Systems
+                </a>
+              </div>
+
+              {/* Verified Telemetry Instrumentation Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6">
+                <div className="p-5 rounded-xl bg-[#121318] space-y-1">
+                  <div className="text-2xl sm:text-3xl font-bold text-white font-display">
+                    900K+
+                  </div>
+                  <div className="text-sm text-[#A2A3B0] leading-tight">
+                    Store Downloads
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-xl bg-[#121318] space-y-1">
+                  <div className="text-2xl sm:text-3xl font-bold text-[#FF5520] font-display">
+                    $25M+
+                  </div>
+                  <div className="text-sm text-[#A2A3B0] leading-tight">
+                    Platform Volume
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-xl bg-[#121318] space-y-1">
+                  <div className="text-2xl sm:text-3xl font-bold text-[#10B981] font-display">
+                    200ms
+                  </div>
+                  <div className="text-sm text-[#A2A3B0] leading-tight">
+                    Socket Latency
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-xl bg-[#121318] space-y-1">
+                  <div className="text-2xl sm:text-3xl font-bold text-[#F59E0B] font-display">
+                    65%
+                  </div>
+                  <div className="text-sm text-[#A2A3B0] leading-tight">
+                    Crash Reduction
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Physical Titanium Hardware Handset */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="w-full max-w-[320px] sm:max-w-[340px]">
+                <IPhoneMockup
+                  screenshotUrl="/screenshots/bigbang-1.webp"
+                  alt="BigBang.Social Flagship Creator Hub"
+                  appName="BigBang.Social Production Handset"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 3. ACT 2: HORIZONTAL PINNED SHOWCASE RAIL */}
+        <StickyScrollShowcase />
+
+        {/* 4. ACT 3: BIGBANG.SOCIAL FLAGSHIP DEEP-DIVE */}
+        <section
+          id="bigbang"
+          data-sc-act="case-study"
+          className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
+        >
+          <div className="p-8 sm:p-12 lg:p-16 rounded-2xl bg-[#121318] space-y-12">
+            
+            {/* Header Plate */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 bg-[#181920] p-8 rounded-xl">
+              <div className="space-y-2">
+                <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
+                  BigBang.Social Super-App
+                </h2>
+                <p className="text-base text-[#E0E0E6] max-w-2xl">
+                  Architected India&apos;s premier creator monetization platform by Collective Artists Network, handling 500,000+ downloads
+                  and processing over $5M+ annually through multi-gateway payment abstraction layers.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href="https://apps.apple.com/us/app/bigbang-social/id6450163388"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
+                >
+                  <span>App Store</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.collectiveartists.bigbangsocial"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
+                >
+                  <span>Google Play</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* Architecture Highlights & Verified Outcomes Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+              
+              {/* Left Column: Systems Engineering Details */}
+              <div className="lg:col-span-7 space-y-6">
+                <h3 className="text-xl sm:text-2xl font-bold text-white font-display">
+                  Core Engineering Contributions
+                </h3>
+
+                <div className="space-y-4">
+                  <div className="p-6 rounded-xl bg-[#181920] space-y-2">
+                    <h4 className="text-lg font-bold text-white">
+                      Payment Abstraction Layer ($5M+ Annual Volume)
+                    </h4>
+                    <p className="text-base text-[#E0E0E6] leading-relaxed">
+                      Engineered a resilient multi-gateway adapter unifying Cashfree and Razorpay APIs.
+                      Zero dropped transactions during high-concurrency brand payout drops with automated retry fallbacks.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-xl bg-[#181920] space-y-2">
+                    <h4 className="text-lg font-bold text-white">
+                      65% Crash Reduction via Memory Profiling
+                    </h4>
+                    <p className="text-base text-[#E0E0E6] leading-relaxed">
+                      Conducted low-level memory inspection in Xcode Instruments and Android Studio Profiler,
+                      eliminating texture retention leaks and dropping crash rates from 2.1% down to 0.7%.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-xl bg-[#181920] space-y-2">
+                    <h4 className="text-lg font-bold text-white">
+                      Deep OS Integrations & Automated KYC
+                    </h4>
+                    <p className="text-base text-[#E0E0E6] leading-relaxed">
+                      Constructed custom platform channels bridging native iOS and Android media engines
+                      with Instagram Graph API, YouTube Data API, and DigiLocker instant verification.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Tech Stack Tags */}
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {['Flutter', 'MethodChannels', 'DigiLocker KYC', 'Cashfree', 'Razorpay', 'Fastlane', 'Mixpanel', 'CleverTap'].map((t) => (
+                    <span key={t} className="px-3.5 py-1.5 rounded-lg text-sm bg-[#181920] text-[#F5F5F7]">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: 3 Verified Screenshots with Lightbox Trigger */}
+              <div className="lg:col-span-5 space-y-4">
+                <div className="text-base font-semibold text-white flex items-center justify-between">
+                  <span>Production App Screens</span>
+                  <span className="text-sm text-[#A2A3B0]">Tap image to inspect full-res</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  {MOBILE_APPS[0].screens.map((screen, idx) => (
+                    <button
+                      key={screen.id}
+                      type="button"
+                      onClick={() => openLightbox(MOBILE_APPS[0].screens, idx)}
+                      className="group rounded-xl overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D93800]"
+                    >
+                      <img
+                        src={screen.url}
+                        alt={screen.label}
+                        className="w-full aspect-[444/960] object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <p className="text-sm text-[#A2A3B0] pt-1">
+                  Screens: Brand Collaborations Hub, Social OAuth Analytics Pipeline, and Automated DigiLocker KYC settlement.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 5. ACT 4: UNDER 25 UNIVERSE DEEP-DIVE */}
+        <section
+          id="under25"
+          data-sc-act="case-study"
+          className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
+        >
+          <div className="p-8 sm:p-12 lg:p-16 rounded-2xl bg-[#121318] space-y-12">
+            
+            {/* Header Plate */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 bg-[#181920] p-8 rounded-xl">
+              <div className="space-y-2">
+                <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
+                  Under 25 Universe Ecosystem
+                </h2>
+                <p className="text-base text-[#E0E0E6] max-w-2xl">
+                  Spearheaded the mobile architecture for India&apos;s largest student network, supporting
+                  400,000+ users and enabling over $20M+ in campus micro-missions and platform earnings.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href="https://apps.apple.com/us/app/under-25/id1580357687"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
+                >
+                  <span>App Store</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.under25universe.under25app"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
+                >
+                  <span>Google Play</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* Architecture Highlights & Verified Outcomes Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+              
+              {/* Left Column: Systems Engineering Details */}
+              <div className="lg:col-span-7 space-y-6">
+                <h3 className="text-xl sm:text-2xl font-bold text-white font-display">
+                  Core Engineering Contributions
+                </h3>
+
+                <div className="space-y-4">
+                  <div className="p-6 rounded-xl bg-[#181920] space-y-2">
+                    <h4 className="text-lg font-bold text-white">
+                      200ms Low-Latency WebSocket Chat Engine
+                    </h4>
+                    <p className="text-base text-[#E0E0E6] leading-relaxed">
+                      Offloaded message JSON parsing and socket multiplexing to dedicated background Dart Isolates,
+                      dropping message latency from 500ms down to 200ms for campus discussion spaces.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-xl bg-[#181920] space-y-2">
+                    <h4 className="text-lg font-bold text-white">
+                      30+ Reusable Design System Component Library
+                    </h4>
+                    <p className="text-base text-[#E0E0E6] leading-relaxed">
+                      Standardized core widgets across missions, wallets, and community feeds,
+                      accelerating cross-team delivery cycles by 30% and eliminating visual regressions.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-xl bg-[#181920] space-y-2">
+                    <h4 className="text-lg font-bold text-white">
+                      60 FPS Rendering in Low-Bandwidth Networks
+                    </h4>
+                    <p className="text-base text-[#E0E0E6] leading-relaxed">
+                      Implemented custom local caching layers and repaint boundaries,
+                      preventing layout thrashing on budget Android devices across 400+ campus regions.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Tech Stack Tags */}
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {['Flutter', 'WebSockets', 'Dart Isolates', '30+ Widget System', 'A/B Testing Engine', '60 FPS Profiling'].map((t) => (
+                    <span key={t} className="px-3.5 py-1.5 rounded-lg text-sm bg-[#181920] text-[#F5F5F7]">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: 3 Verified Screenshots with Lightbox Trigger */}
+              <div className="lg:col-span-5 space-y-4">
+                <div className="text-base font-semibold text-white flex items-center justify-between">
+                  <span>Student App Screens</span>
+                  <span className="text-sm text-[#A2A3B0]">Tap image to inspect full-res</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  {MOBILE_APPS[1].screens.map((screen, idx) => (
+                    <button
+                      key={screen.id}
+                      type="button"
+                      onClick={() => openLightbox(MOBILE_APPS[1].screens, idx)}
+                      className="group rounded-xl overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]"
+                    >
+                      <img
+                        src={screen.url}
+                        alt={screen.label}
+                        className="w-full aspect-[442/960] object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <p className="text-sm text-[#A2A3B0] pt-1">
+                  Screens: Student Gigs Feed, 200ms Real-Time Campus Spaces, and Interactive Collectibles Wallet.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 6. ACT 5: ARCHITECTURAL LAYERS & SILICON BRIDGE */}
+        <section
+          id="architecture"
+          data-sc-act="curtain-reveal"
+          className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
+        >
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
+                Flutter to Silicon Internals
+              </h2>
+              <p className="text-base text-[#E0E0E6] max-w-2xl mt-2">
+                Inspect the four architectural layers powering 60 FPS rendering, background isolates,
+                and native OS bridges across production deployments.
+              </p>
+            </div>
+
+            {/* Layer Selection Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {ARCHITECTURE_LAYERS.map((layer, idx) => {
+                const isSelected = activeArchLayer === idx;
+                return (
+                  <button
+                    key={layer.id}
+                    type="button"
+                    onClick={() => setActiveArchLayer(idx)}
+                    className={`p-5 rounded-xl text-left transition-colors ${
+                      isSelected
+                        ? 'bg-[#1E2028] text-white border-2 border-[#D93800]'
+                        : 'bg-[#121318] text-[#E0E0E6] hover:bg-[#181920] hover:text-white'
+                    }`}
+                  >
+                    <div className="text-sm text-[#FF5520] font-semibold mb-1">
+                      Layer {idx + 1}
+                    </div>
+                    <div className="text-lg font-bold text-white font-display">
+                      {layer.name.replace(/LAYER \d+ \/\/ /, '')}
+                    </div>
+                    <div className="text-sm mt-2 text-[#A2A3B0]">
+                      {layer.metrics}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Selected Layer Architectural Breakdown */}
+            <div className="p-8 sm:p-12 rounded-2xl bg-[#121318] space-y-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 bg-[#181920] p-6 rounded-xl">
+                <div>
+                  <h3 className="text-2xl font-bold text-white font-display">
+                    {currentLayer.name}
+                  </h3>
+                  <p className="text-sm text-[#FF5520] mt-0.5">
+                    {currentLayer.subtitle}
+                  </p>
+                </div>
+                <div className="px-4 py-2 rounded-lg bg-[#22232D] text-sm text-[#F5F5F7] font-semibold self-start md:self-auto">
+                  {currentLayer.metrics}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="text-base font-semibold text-white">
+                  Architectural Specifications
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {currentLayer.details.map((detail, i) => (
+                    <div key={i} className="p-5 rounded-xl bg-[#181920] text-sm sm:text-base text-[#E0E0E6] leading-relaxed">
+                      {detail}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Ambient Engine Video Loop */}
+              <div className="rounded-xl overflow-hidden bg-[#070709] max-h-[240px] flex items-center justify-center">
+                <video
+                  src="/videos/abstract-painting-shapes-opt.mp4"
+                  poster="/images/triptych-background.png"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover opacity-60"
+                />
+              </div>
+
+              <div className="pt-2 flex flex-wrap gap-2">
+                {currentLayer.tech.map((t) => (
+                  <span key={t} className="px-3.5 py-1.5 rounded-lg text-sm bg-[#181920] text-[#F5F5F7]">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 7. ACT 6: SARVAM AI STUDIO (THE PEAK — INTERACTIVE STAGE) */}
+        <section
+          id="sarvam"
+          data-sc-act="interactive-stage"
+          className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-16 sc-enter"
+        >
+          <div className="space-y-8">
+            
+            {/* Peak Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div>
+                <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
+                  Sarvam AI Mobile SDKs
+                </h2>
+                <p className="text-base text-[#E0E0E6] max-w-2xl mt-2">
+                  Author of the official client SDK monorepo for Sarvam AI&apos;s Indic-first speech and language platform.
+                  Clean Architecture across iOS, Android, Flutter, React Native, and Go with 97.8% test coverage.
+                </p>
+              </div>
+
+              <a
+                href="https://github.com/ibhanu/sarvam-mobile"
+                target="_blank"
+                rel="noreferrer"
+                className="px-5 py-3 rounded-lg text-sm font-semibold bg-[#D93800] text-white hover:bg-[#B82F00] transition-colors flex items-center gap-2 self-start md:self-auto"
+              >
+                <span>Inspect Monorepo on GitHub</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
+
+            {/* Interactive Multi-Platform Code Workbench */}
+            <div className="p-6 sm:p-10 rounded-2xl bg-[#121318] space-y-6">
+              
+              {/* Platform Selector Tabs */}
+              <div className="flex flex-wrap gap-2">
+                {SARVAM_SDK_TABS.map((tab, idx) => {
+                  const isSelected = selectedSdkTab === idx;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setSelectedSdkTab(idx)}
+                      className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                        isSelected
+                          ? 'bg-[#D93800] text-white'
+                          : 'bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Tab Header Plate */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#181920] p-4 rounded-xl">
+                <div>
+                  <span className="text-base font-bold text-white block">
+                    {currentTab.packageBadge}
+                  </span>
+                  <span className="text-sm text-[#A2A3B0]">
+                    {currentTab.architectureNote}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => copyCodeToClipboard(currentTab.code)}
+                    type="button"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-[#22232D] text-[#F5F5F7] hover:bg-[#2C2E3B] transition-colors"
+                  >
+                    {copiedCode ? (
+                      <>
+                        <Check className="w-4 h-4 text-[#10B981]" />
+                        <span className="text-[#10B981]">Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        <span>Copy Code</span>
+                      </>
+                    )}
+                  </button>
+                  <a
+                    href={currentTab.packageUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm bg-[#22232D] text-[#F5F5F7] hover:bg-[#2C2E3B] transition-colors"
+                  >
+                    <span>Package</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+
+              {/* Verified Production Code Block */}
+              <div
+                data-ui="code-block"
+                className="relative rounded-xl overflow-hidden bg-[#070709] p-5 sm:p-7"
+              >
+                <div className="flex items-center justify-between pb-3 text-sm text-[#A2A3B0]">
+                  <span className="flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-[#FF5520]" />
+                    <span>Production Implementation Snippet ({currentTab.language})</span>
+                  </span>
+                  <span>97.8% Tested</span>
+                </div>
+
+                <pre className="text-sm text-[#F5F5F7] overflow-x-auto leading-relaxed pt-2 px-2">
+                  <code>{currentTab.code}</code>
+                </pre>
+              </div>
+
+              {/* Telemetry Footnote */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div className="p-4 rounded-xl bg-[#181920]">
+                  <div className="text-base font-bold text-white">4 Client SDKs</div>
+                  <div className="text-sm text-[#A2A3B0] mt-0.5">Flutter, SwiftPM, Kotlin, and React Native TurboModules</div>
+                </div>
+                <div className="p-4 rounded-xl bg-[#181920]">
+                  <div className="text-base font-bold text-[#10B981]">97.8% Coverage</div>
+                  <div className="text-sm text-[#A2A3B0] mt-0.5">Automated unit and integration test suites with CI/CD</div>
+                </div>
+                <div className="p-4 rounded-xl bg-[#181920]">
+                  <div className="text-base font-bold text-[#FF5520]">10+ Indic Languages</div>
+                  <div className="text-sm text-[#A2A3B0] mt-0.5">Real-time PCM voice streaming for Hindi, Tamil, Kannada, and more</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 8. ACT 7: CONSUMER CRAFT (AURA DATING & MANGO AFFIRMATIONS) */}
+        <section
+          id="opensource"
+          data-sc-act="panoramic-flow"
+          className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 sc-enter"
+        >
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-display">
+                Gesture Physics & Native Widgets
+              </h2>
+              <p className="text-base text-[#E0E0E6] max-w-2xl mt-2">
+                Production-grade consumer applications engineered with custom 60 FPS physics engines,
+                native iOS WidgetKit bridges, and Supabase real-time architectures.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              
+              {/* Product 1: Aura Dating */}
+              <div className="p-8 rounded-2xl bg-[#121318] space-y-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white font-display">
+                      Aura Dating
+                    </h3>
+                    <p className="text-sm text-[#FF5520] mt-0.5">
+                      60 FPS Spring Card Swipe Physics & Realtime Chat
+                    </p>
+                  </div>
+                  <a
+                    href="https://github.com/ibhanu/aura"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-2.5 rounded-lg bg-[#181920] text-white hover:bg-[#22232D] transition-colors"
+                    aria-label="Aura Dating GitHub"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </div>
+
+                <p className="text-base text-[#E0E0E6] leading-relaxed">
+                  Engineered with Clean Architecture (Data / Domain / Presentation), custom velocity-aware swipe
+                  physics, real-time Supabase messaging, and dark profile workflows.
+                </p>
+
+                <div className="grid grid-cols-3 gap-2.5">
+                  {MOBILE_APPS[2].screens.map((screen, idx) => (
+                    <button
+                      key={screen.id}
+                      type="button"
+                      onClick={() => openLightbox(MOBILE_APPS[2].screens, idx)}
+                      className="group rounded-lg overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D93800]"
+                    >
+                      <img
+                        src={screen.url}
+                        alt={screen.label}
+                        className="w-full aspect-[1206/2622] object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {['Flutter 3.32', 'Dart 3.8', 'Supabase Realtime', 'Clean Architecture', 'GetX'].map((t) => (
+                    <span key={t} className="px-3 py-1 rounded text-sm bg-[#181920] text-[#F5F5F7]">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Product 2: Mango Affirmations */}
+              <div className="p-8 rounded-2xl bg-[#121318] space-y-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white font-display">
+                      Mango: Mind Architected
+                    </h3>
+                    <p className="text-sm text-[#F59E0B] mt-0.5">
+                      60 FPS Parallax Engine & Native iOS WidgetKit
+                    </p>
+                  </div>
+                  <a
+                    href="https://github.com/ibhanu/mango"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-2.5 rounded-lg bg-[#181920] text-white hover:bg-[#22232D] transition-colors"
+                    aria-label="Mango GitHub"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </div>
+
+                <p className="text-base text-[#E0E0E6] leading-relaxed">
+                  Features multi-layer sensor/scroll parallax backgrounds, an evolving mascot streak system,
+                  and a native Swift WidgetKit bridge syncing daily affirmations to Home and Lock screens.
+                </p>
+
+                <div className="grid grid-cols-3 gap-2.5">
+                  {MOBILE_APPS[3].screens.map((screen, idx) => (
+                    <button
+                      key={screen.id}
+                      type="button"
+                      onClick={() => openLightbox(MOBILE_APPS[3].screens, idx)}
+                      className="group rounded-lg overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F59E0B]"
+                    >
+                      <img
+                        src={screen.url}
+                        alt={screen.label}
+                        className="w-full aspect-[1206/2622] object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {['Flutter', 'iOS WidgetKit', 'Parallax Engine', 'Custom Shaders', 'Haptics'].map((t) => (
+                    <span key={t} className="px-3 py-1 rounded text-sm bg-[#181920] text-[#F5F5F7]">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 9. ACT 8: BENGALURU SYSTEMS CLOSE & CREDENTIALS RESOLVE */}
+        <section
+          id="contact"
+          data-sc-act="monument-resolve"
+          className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pb-24 sc-enter"
+        >
+          <div className="p-8 sm:p-14 lg:p-20 rounded-2xl bg-[#121318] space-y-10">
+            <div className="space-y-4 max-w-3xl">
+              <h2 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white font-display uppercase leading-[0.98]">
+                Building the Next Mobile Frontier.
+              </h2>
+              <p className="text-lg text-[#E0E0E6] leading-relaxed pt-2">
+                Available for Staff / Principal Mobile Engineering Leadership,
+                high-scale mobile system audits, and select 0-to-1 product architecture partnerships.
+              </p>
+            </div>
+
+            {/* Direct Contact & Action Bar */}
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <a
+                href={`mailto:${PROFILE_DATA.email}`}
+                className="px-7 py-4 rounded-lg text-base font-semibold bg-[#D93800] text-white hover:bg-[#B82F00] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D93800]"
+              >
+                Start an Engineering Conversation
+              </a>
+              <button
+                onClick={copyEmailToClipboard}
+                type="button"
+                className="px-6 py-4 rounded-lg text-base font-semibold bg-[#181920] text-[#F5F5F7] hover:bg-[#22232D] transition-colors"
+              >
+                {copiedEmail ? 'Email Copied to Clipboard' : 'Copy Email Address'}
+              </button>
+              <button
+                onClick={() => setIsResumeOpen(true)}
+                type="button"
+                className="px-6 py-4 rounded-lg text-base font-semibold bg-[#181920] text-[#F5F5F7] hover:bg-[#22232D] transition-colors"
+              >
+                Verified Credentials (PDF)
+              </button>
+            </div>
+
+            {/* Coordinates & Links Plate */}
+            <div className="pt-10 bg-[#181920] p-6 sm:p-8 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-6 text-sm text-[#E0E0E6]">
+              <div className="space-y-1">
+                <span className="text-white font-bold block">Bhanu Pratap</span>
+                <span>Bengaluru, Karnataka, India • +91 7089265084</span>
+              </div>
+
+              <div className="flex items-center gap-6 font-medium">
+                <a
+                  href={PROFILE_DATA.github}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-white transition-colors"
                 >
                   GitHub
                 </a>
@@ -435,805 +991,16 @@ export default function BhanuDeveloperPortfolio() {
                   href={PROFILE_DATA.linkedin}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-3 sm:px-4 py-2.5 sm:py-3 min-h-[44px] flex items-center justify-center rounded-lg border border-[#F4F0EA]/20 text-xs sm:text-sm font-mono hover:bg-[#F4F0EA]/10 transition-colors"
+                  className="hover:text-white transition-colors"
                 >
                   LinkedIn
                 </a>
-              </div>
-            </div>
-
-            {/* Mobile Hero Screenshot Row with Tap-to-Enlarge */}
-            <div className="lg:col-span-5 lg:hidden space-y-2">
-              <div className="flex items-center justify-between text-xs font-mono text-[#9DA4B0] px-1">
-                <span>Featured Mobile Screens</span>
-                <span className="text-[#FF4F1F] text-[11px]">Tap to inspect</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                {[
-                  { url: '/screenshots/bigbang-2.webp', label: 'BigBang.Social — Earnings' },
-                  { url: '/screenshots/under25-1.webp', label: 'Under 25 — Missions' },
-                  { url: '/screenshots/aura-discovery.webp', label: 'Aura — Discovery Deck' },
-                ].map((item, idx, arr) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => openLightbox(arr, idx)}
-                    className="group relative overflow-hidden rounded-xl border border-[#F4F0EA]/15 shadow-md"
-                  >
-                    <img
-                      src={item.url}
-                      alt={item.label}
-                      className="w-full h-40 sm:h-48 object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 p-1 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-between text-[10px] font-mono text-white">
-                      <span className="truncate">{item.label.split('—')[0]}</span>
-                      <Maximize2 className="w-3 h-3 text-[#FF4F1F] flex-shrink-0" />
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ===================================================================
-            ACT II: PINNED HORIZONTAL HARDWARE SHOWCASE (Scrollcraft Device: data-sc-act="pan")
-            =================================================================== */}
-        <StickyScrollShowcase />
-
-        {/* ===================================================================
-            ACT III: BIGBANG.SOCIAL (Scrollcraft Device: Pinned Stage + Screen Switcher)
-            =================================================================== */}
-        <section
-          id="bigbang"
-          data-sc-pin="bigbang"
-          className="scroll-mt-20 py-20 sm:py-32 border-t border-[#F4F0EA]/10"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-            <div className="lg:col-span-7 space-y-6 sm:space-y-8 bg-[#07080B]/85 backdrop-blur-md p-5 sm:p-9 rounded-2xl border border-[#F4F0EA]/10">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F4F0EA]/10 pb-4">
-                <div>
-                  <span className="font-mono text-xs uppercase tracking-wider text-[#FF4F1F]">
-                    Tech Lead App, Jul 2023 to Apr 2026
-                  </span>
-                  <h2 className="text-2xl sm:text-5xl font-bold tracking-tight mt-1">
-                    BigBang.Social
-                  </h2>
-                </div>
-                <div className="flex items-center gap-2">
-                  {bigbangApp.appStoreUrl && (
-                    <a
-                      href={bigbangApp.appStoreUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-3 py-1.5 min-h-[44px] flex items-center rounded-lg bg-[#F4F0EA]/10 hover:bg-[#F4F0EA]/20 font-mono text-xs"
-                    >
-                      App Store
-                    </a>
-                  )}
-                  {bigbangApp.playStoreUrl && (
-                    <a
-                      href={bigbangApp.playStoreUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-3 py-1.5 min-h-[44px] flex items-center rounded-lg bg-[#F4F0EA]/10 hover:bg-[#F4F0EA]/20 font-mono text-xs"
-                    >
-                      Google Play
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              <p className="text-sm sm:text-lg text-[#9DA4B0] leading-relaxed max-w-[65ch]">
-                Creator monetization platform by Collective Artists Network. As
-                Tech Lead for the mobile app, I built the payment abstraction
-                layer, native social and KYC integrations, and CI/CD release
-                pipeline while mentoring a team of 4 Flutter engineers.
-              </p>
-
-              {/* Interactive Screen Switcher */}
-              <div className="space-y-3">
-                <div className="text-xs font-mono text-[#9DA4B0]">
-                  Select a screen to preview on device:
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
-                  {bigbangApp.screens.map((scr, idx) => {
-                    const isSelected = bbActiveScreen === idx;
-                    return (
-                      <button
-                        key={scr.id}
-                        type="button"
-                        onClick={() =>
-                          setScreenOverrides((prev) => ({
-                            ...prev,
-                            bigbang: idx,
-                          }))
-                        }
-                        className={`text-left p-3 sm:p-3.5 min-h-[44px] rounded-xl border transition-all ${
-                          isSelected
-                            ? 'bg-[#FF4F1F]/15 border-[#FF4F1F] text-[#F4F0EA]'
-                            : 'bg-[#0F1218] border-[#F4F0EA]/10 text-[#9DA4B0] hover:border-[#F4F0EA]/30'
-                        }`}
-                      >
-                        <div className="font-mono text-xs text-[#FF4F1F]">
-                          Screen 0{idx + 1}
-                        </div>
-                        <div className="font-semibold text-xs sm:text-sm text-[#F4F0EA] mt-0.5">
-                          {scr.label}
-                        </div>
-                        <div className="text-[11px] text-[#9DA4B0] mt-0.5">
-                          {scr.caption}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Concrete Engineering Highlights */}
-              <div className="space-y-3 sm:space-y-4 pt-2">
-                <h3 className="font-mono text-xs uppercase tracking-wider text-[#9DA4B0]">
-                  What I Built and Shipped
-                </h3>
-                <ul className="space-y-3 text-xs sm:text-base text-[#F4F0EA]/90 leading-relaxed">
-                  <li className="flex gap-3">
-                    <span className="text-[#FF4F1F] font-mono font-bold">01</span>
-                    <span>
-                      Built custom payment abstraction layers over Cashfree and
-                      Razorpay that processed $5M+ in annual creator payouts
-                      across 500,000+ downloads.
-                    </span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-[#FF4F1F] font-mono font-bold">02</span>
-                    <span>
-                      Wrote custom iOS and Android platform channels for
-                      real-time media processing and connected Instagram,
-                      YouTube, and DigiLocker to remove manual KYC delays.
-                    </span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-[#FF4F1F] font-mono font-bold">03</span>
-                    <span>
-                      Ran memory profiling and lifecycle fixes that cut the app
-                      crash rate by 65%, from 2.1% down to 0.7%, and sped up
-                      cold start times.
-                    </span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-[#FF4F1F] font-mono font-bold">04</span>
-                    <span>
-                      Integrated Mixpanel, Firebase Analytics, AppsFlyer, and
-                      CleverTap for user segmentation, lifting Day-30 retention
-                      by 18%, and set up Fastlane and GitHub Actions CI/CD to
-                      cut deployment time by 75%.
-                    </span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Tap to Enlarge Screenshots Gallery */}
-              <div className="space-y-2 pt-2">
-                <div className="flex items-center justify-between text-xs font-mono text-[#9DA4B0] px-1">
-                  <span>Production App Screens</span>
-                  <span className="text-[#FF4F1F] text-[11px]">Tap to zoom</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-                  {bigbangApp.screens.map((scr, idx) => (
-                    <button
-                      key={scr.id}
-                      type="button"
-                      onClick={() => {
-                        setScreenOverrides((prev) => ({ ...prev, bigbang: idx }));
-                        openLightbox(bigbangApp.screens, idx);
-                      }}
-                      className={`group relative overflow-hidden rounded-xl border transition-all ${
-                        bbActiveScreen === idx
-                          ? 'border-[#FF4F1F] ring-2 ring-[#FF4F1F]/40'
-                          : 'border-[#F4F0EA]/15 opacity-80 hover:opacity-100'
-                      }`}
-                    >
-                      <img
-                        src={scr.url}
-                        alt={scr.label}
-                        className="w-full h-40 sm:h-56 object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-x-0 bottom-0 p-1 sm:p-1.5 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-between text-[10px] font-mono text-white">
-                        <span className="truncate">{scr.label}</span>
-                        <Maximize2 className="w-3 h-3 text-[#FF4F1F] flex-shrink-0 ml-1" />
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ===================================================================
-            ACT III: UNDER 25 UNIVERSE (Scrollcraft Device: Split Stage)
-            =================================================================== */}
-        <section
-          id="under25"
-          data-sc-pin="under25"
-          className="scroll-mt-20 py-20 sm:py-32 border-t border-[#F4F0EA]/10"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-            <div className="lg:col-span-7 space-y-6 sm:space-y-8 bg-[#07080B]/85 backdrop-blur-md p-5 sm:p-9 rounded-2xl border border-[#F4F0EA]/10">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F4F0EA]/10 pb-4">
-                <div>
-                  <span className="font-mono text-xs uppercase tracking-wider text-[#10B981]">
-                    Senior Flutter Developer, Oct 2021 to Jun 2023
-                  </span>
-                  <h2 className="text-2xl sm:text-5xl font-bold tracking-tight mt-1">
-                    Under 25 Universe
-                  </h2>
-                </div>
-                <div className="flex items-center gap-2">
-                  {under25App.appStoreUrl && (
-                    <a
-                      href={under25App.appStoreUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-3 py-1.5 min-h-[44px] flex items-center rounded-lg bg-[#F4F0EA]/10 hover:bg-[#F4F0EA]/20 font-mono text-xs"
-                    >
-                      App Store
-                    </a>
-                  )}
-                  {under25App.playStoreUrl && (
-                    <a
-                      href={under25App.playStoreUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-3 py-1.5 min-h-[44px] flex items-center rounded-lg bg-[#F4F0EA]/10 hover:bg-[#F4F0EA]/20 font-mono text-xs"
-                    >
-                      Google Play
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              <p className="text-sm sm:text-lg text-[#9DA4B0] leading-relaxed max-w-[65ch]">
-                Student community and earning app. I led the Flutter mobile
-                experience for 400,000+ students completing missions, joining
-                campus spaces, and earning over $20M+ on the platform.
-              </p>
-
-              {/* Interactive Screen Switcher for Under 25 */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
-                {under25App.screens.map((scr, idx) => {
-                  const isSelected = u25ActiveScreen === idx;
-                  return (
-                    <button
-                      key={scr.id}
-                      type="button"
-                      onClick={() =>
-                        setScreenOverrides((prev) => ({
-                          ...prev,
-                          under25: idx,
-                        }))
-                      }
-                      className={`text-left p-3 sm:p-3.5 min-h-[44px] rounded-xl border transition-all ${
-                        isSelected
-                          ? 'bg-[#10B981]/15 border-[#10B981] text-[#F4F0EA]'
-                          : 'bg-[#0F1218] border-[#F4F0EA]/10 text-[#9DA4B0] hover:border-[#F4F0EA]/30'
-                      }`}
-                    >
-                      <div className="font-mono text-xs text-[#10B981]">
-                        Screen 0{idx + 1}
-                      </div>
-                      <div className="font-semibold text-xs sm:text-sm text-[#F4F0EA] mt-0.5">
-                        {scr.label}
-                      </div>
-                      <div className="text-[11px] text-[#9DA4B0] mt-0.5">
-                        {scr.caption}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="space-y-3 sm:space-y-4 pt-2">
-                <h3 className="font-mono text-xs uppercase tracking-wider text-[#9DA4B0]">
-                  What I Built and Shipped
-                </h3>
-                <ul className="space-y-3 text-xs sm:text-base text-[#F4F0EA]/90 leading-relaxed">
-                  <li className="flex gap-3">
-                    <span className="text-[#10B981] font-mono font-bold">01</span>
-                    <span>
-                      Built the real-time chat system on WebSockets with
-                      background isolate threading, dropping message latency
-                      from 500ms to 200ms.
-                    </span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-[#10B981] font-mono font-bold">02</span>
-                    <span>
-                      Standardized state management and created a shared library
-                      of 30+ reusable widgets, cutting feature development time
-                      by 30% and reducing cross-feature UI bugs.
-                    </span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-[#10B981] font-mono font-bold">03</span>
-                    <span>
-                      Cut redundant API calls for low-bandwidth campus networks,
-                      built custom A/B testing pipelines, and removed rendering
-                      bottlenecks to keep scrolling at 60 FPS.
-                    </span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Tap to Enlarge Screenshots Gallery */}
-              <div className="space-y-2 pt-2">
-                <div className="flex items-center justify-between text-xs font-mono text-[#9DA4B0] px-1">
-                  <span>Student Super-App Screens</span>
-                  <span className="text-[#10B981] text-[11px]">Tap to zoom</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-                  {under25App.screens.map((scr, idx) => (
-                    <button
-                      key={scr.id}
-                      type="button"
-                      onClick={() => {
-                        setScreenOverrides((prev) => ({ ...prev, under25: idx }));
-                        openLightbox(under25App.screens, idx);
-                      }}
-                      className={`group relative overflow-hidden rounded-xl border transition-all ${
-                        u25ActiveScreen === idx
-                          ? 'border-[#10B981] ring-2 ring-[#10B981]/40'
-                          : 'border-[#F4F0EA]/15 opacity-80 hover:opacity-100'
-                      }`}
-                    >
-                      <img
-                        src={scr.url}
-                        alt={scr.label}
-                        className="w-full h-40 sm:h-56 object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-x-0 bottom-0 p-1 sm:p-1.5 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-between text-[10px] font-mono text-white">
-                        <span className="truncate">{scr.label}</span>
-                        <Maximize2 className="w-3 h-3 text-[#10B981] flex-shrink-0 ml-1" />
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ===================================================================
-            ACT IV: OPEN-SOURCE CONSUMER APPS (AURA & MANGO)
-            =================================================================== */}
-        <section
-          id="opensource"
-          data-sc-pan="opensource"
-          className="scroll-mt-20 py-20 sm:py-32 border-t border-[#F4F0EA]/10"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-            <div className="lg:col-span-7 space-y-6 sm:space-y-8 bg-[#07080B]/88 backdrop-blur-md p-5 sm:p-9 rounded-2xl border border-[#F4F0EA]/10">
-              <div>
-                <span className="font-mono text-xs uppercase tracking-wider text-[#F59E0B]">
-                  Open-Source Consumer Products
-                </span>
-                <h2 className="text-2xl sm:text-5xl font-bold tracking-tight mt-1">
-                  Aura Dating & Mango
-                </h2>
-                <p className="text-sm sm:text-base text-[#9DA4B0] mt-2 sm:mt-3 max-w-[62ch]">
-                  Outside of my full-time roles, I design and ship full-stack
-                  Flutter apps end to end, from gesture physics and iOS home
-                  screen widgets to Supabase backends.
-                </p>
-              </div>
-
-              {/* Project 1: Aura */}
-              <div className="p-4 sm:p-6 rounded-xl bg-[#0F1218] border border-[#F4F0EA]/10 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-[#F4F0EA]">
-                      {auraApp.name}
-                    </h3>
-                    <p className="text-xs font-mono text-[#FF4F1F]">
-                      Flutter 3.32, Supabase Realtime, Clean Architecture
-                    </p>
-                  </div>
-                  {auraApp.githubUrl && (
-                    <a
-                      href={auraApp.githubUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-3 py-1.5 min-h-[44px] flex items-center rounded-lg bg-[#FF4F1F] text-[#F4F0EA] font-mono text-xs"
-                    >
-                      GitHub Repo
-                    </a>
-                  )}
-                </div>
-                <p className="text-xs sm:text-sm text-[#9DA4B0] leading-relaxed">
-                  Open-source dating app in Flutter and Supabase. Includes a
-                  card discovery deck with custom spring-physics swipe gestures,
-                  real-time Postgres chat, and freemium paywall flows separated
-                  into data, domain, and presentation layers.
-                </p>
-                <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                  {auraApp.screens.map((scr, idx) => (
-                    <button
-                      key={scr.id}
-                      type="button"
-                      onClick={() => {
-                        setScreenOverrides((prev) => ({ ...prev, aura: idx }));
-                        openLightbox(auraApp.screens, idx);
-                      }}
-                      className={`group relative overflow-hidden rounded-lg border text-left transition-all ${
-                        auraActiveScreen === idx
-                          ? 'border-[#FF4F1F] ring-2 ring-[#FF4F1F]/40'
-                          : 'border-[#F4F0EA]/10 opacity-80 hover:opacity-100'
-                      }`}
-                    >
-                      <img
-                        src={scr.url}
-                        alt={scr.label}
-                        className="w-full h-32 sm:h-44 object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="p-1.5 text-[10px] sm:text-[11px] font-mono text-[#F4F0EA] truncate flex items-center justify-between">
-                        <span className="truncate">{scr.label}</span>
-                        <Maximize2 className="w-2.5 h-2.5 text-[#FF4F1F] flex-shrink-0 ml-1" />
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Project 2: Mango */}
-              <div className="p-4 sm:p-6 rounded-xl bg-[#0F1218] border border-[#F4F0EA]/10 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-[#F4F0EA]">
-                      Mango: Daily Affirmations
-                    </h3>
-                    <p className="text-xs font-mono text-[#F59E0B]">
-                      Flutter, Native iOS WidgetKit, 60 FPS Parallax
-                    </p>
-                  </div>
-                  {mangoApp.githubUrl && (
-                    <a
-                      href={mangoApp.githubUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-3 py-1.5 min-h-[44px] flex items-center rounded-lg bg-[#F59E0B] text-[#111318] font-mono text-xs font-semibold"
-                    >
-                      GitHub Repo
-                    </a>
-                  )}
-                </div>
-                <p className="text-xs sm:text-sm text-[#9DA4B0] leading-relaxed">
-                  Consumer daily affirmation app with multi-layer parallax
-                  backgrounds, a streak mascot progression system, custom theme
-                  studio, and native iOS Home Screen and Lock Screen widgets
-                  built with Swift WidgetKit.
-                </p>
-                <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                  {mangoApp.screens.map((scr, idx) => (
-                    <button
-                      key={scr.id}
-                      type="button"
-                      onClick={() => {
-                        setScreenOverrides((prev) => ({ ...prev, mango: idx }));
-                        openLightbox(mangoApp.screens, idx);
-                      }}
-                      className={`group relative overflow-hidden rounded-lg border text-left transition-all ${
-                        mangoActiveScreen === idx
-                          ? 'border-[#F59E0B] ring-2 ring-[#F59E0B]/40'
-                          : 'border-[#F4F0EA]/10 opacity-80 hover:opacity-100'
-                      }`}
-                    >
-                      <img
-                        src={scr.url}
-                        alt={scr.label}
-                        className="w-full h-32 sm:h-44 object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="p-1.5 text-[10px] sm:text-[11px] font-mono text-[#F4F0EA] truncate flex items-center justify-between">
-                        <span className="truncate">{scr.label}</span>
-                        <Maximize2 className="w-2.5 h-2.5 text-[#F59E0B] flex-shrink-0 ml-1" />
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ===================================================================
-            ACT V: HARD GROUND CUT TO WARM PAPER — SARVAM AI SDKs & GO BACKEND
-            (Scrollcraft Device: Hard Ground Cut `data-sc-ground="paper"`)
-            =================================================================== */}
-        <section
-          id="sdks"
-          data-sc-ground="paper"
-          className="scroll-mt-20 py-20 sm:py-32 bg-[#F4F0EA] text-[#111318] border-t border-[#111318]/15"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-8 sm:space-y-12">
-            <div className="max-w-3xl space-y-3 sm:space-y-4">
-              <span className="font-mono text-xs uppercase tracking-wider text-[#FF4F1F] font-semibold">
-                Multi-Platform SDKs & Backend Boilerplates
-              </span>
-              <h2 className="text-2xl sm:text-5xl font-bold tracking-tight text-[#111318]">
-                Sarvam AI Mobile SDKs & Go Microservices
-              </h2>
-              <p className="text-sm sm:text-lg text-[#111318]/75 leading-relaxed">
-                Alongside consumer apps, I built the 4-platform mobile SDK suite
-                for Sarvam AI (Flutter, iOS SwiftPM, Android Kotlin, and React
-                Native) with 97.8% test coverage, plus a production Go
-                microservice template with JWT auth, Prisma PostgreSQL, and
-                Docker.
-              </p>
-            </div>
-
-            {/* Interactive Code Explorer across all 5 languages */}
-            <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-8 items-start">
-              {/* MOBILE HORIZONTAL PILL RAIL */}
-              <div className="lg:hidden flex overflow-x-auto gap-2 pb-2 -mx-4 px-4 no-scrollbar">
-                {SARVAM_SDK_TABS.map((tab, idx) => {
-                  const active = selectedSdkTab === idx;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setSelectedSdkTab(idx)}
-                      className={`flex-shrink-0 px-3.5 py-2.5 min-h-[44px] flex items-center gap-2 rounded-xl text-xs font-mono border transition-all ${
-                        active
-                          ? 'bg-[#111318] text-[#F4F0EA] border-[#111318] font-bold shadow-md'
-                          : 'bg-white/80 text-[#111318] border-[#111318]/15'
-                      }`}
-                    >
-                      <span>{tab.label}</span>
-                      <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded ${
-                          active ? 'bg-[#FF4F1F] text-white' : 'bg-[#111318]/10'
-                        }`}
-                      >
-                        {tab.packageBadge}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* DESKTOP VERTICAL TABS */}
-              <div className="hidden lg:block lg:col-span-5 space-y-3">
-                {SARVAM_SDK_TABS.map((tab, idx) => {
-                  const active = selectedSdkTab === idx;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setSelectedSdkTab(idx)}
-                      className={`w-full text-left p-4 rounded-xl border transition-all ${
-                        active
-                          ? 'bg-[#111318] text-[#F4F0EA] border-[#111318] shadow-md'
-                          : 'bg-white/70 text-[#111318] border-[#111318]/15 hover:border-[#111318]/40'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-bold text-base">{tab.label}</span>
-                        <span
-                          className={`font-mono text-xs px-2 py-0.5 rounded ${
-                            active
-                              ? 'bg-[#FF4F1F] text-[#F4F0EA]'
-                              : 'bg-[#111318]/10 text-[#111318]'
-                          }`}
-                        >
-                          {tab.packageBadge}
-                        </span>
-                      </div>
-                      <p
-                        className={`text-xs mt-2 leading-relaxed ${
-                          active ? 'text-[#F4F0EA]/80' : 'text-[#111318]/70'
-                        }`}
-                      >
-                        {tab.architectureNote}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* INTERACTIVE CODE & STREAM BENCHMARK WORKBENCH */}
-              <div className="lg:col-span-7 rounded-2xl bg-[#0B0D12] text-[#F4F0EA] border border-[#111318]/20 overflow-hidden shadow-2xl">
-                <div className="px-4 sm:px-5 py-3 bg-[#131720] border-b border-[#F4F0EA]/10 flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF4F1F] animate-pulse" />
-                    <span className="font-mono text-xs text-[#F4F0EA] truncate font-semibold">
-                      {activeSdk.label} ({activeSdk.packageBadge})
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    {/* Live Stream Benchmark Toggle */}
-                    <button
-                      type="button"
-                      onClick={() => setBenchmarkRunning(!benchmarkRunning)}
-                      className={`px-2.5 py-1 rounded-md text-[11px] font-mono flex items-center gap-1.5 transition-colors border ${
-                        benchmarkRunning
-                          ? 'bg-[#10B981]/15 text-[#10B981] border-[#10B981]/40'
-                          : 'bg-white/5 text-[#9DA4B0] border-white/10 hover:text-white'
-                      }`}
-                    >
-                      <Activity className={`w-3 h-3 ${benchmarkRunning ? 'animate-spin' : ''}`} />
-                      <span>{benchmarkRunning ? 'Streaming PCM: 200ms' : 'Simulate PCM Stream'}</span>
-                    </button>
-
-                    {/* Copy Code Button */}
-                    <button
-                      type="button"
-                      onClick={() => copyCodeToClipboard(activeSdk.code)}
-                      className="px-2.5 py-1 rounded-md text-[11px] font-mono bg-white/5 hover:bg-white/10 border border-white/10 text-[#9DA4B0] hover:text-white flex items-center gap-1.5 transition-colors"
-                      title="Copy code to clipboard"
-                    >
-                      {copiedCode ? <Check className="w-3 h-3 text-[#10B981]" /> : <Copy className="w-3 h-3" />}
-                      <span>{copiedCode ? 'Copied!' : 'Copy'}</span>
-                    </button>
-
-                    <a
-                      href={activeSdk.packageUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-mono text-xs text-[#FF4F1F] hover:underline flex items-center"
-                    >
-                      GitHub
-                    </a>
-                  </div>
-                </div>
-
-                {/* Live Benchmark HUD Bar when active */}
-                {benchmarkRunning && (
-                  <div className="px-4 py-2 bg-[#10B981]/10 border-b border-[#10B981]/20 flex items-center justify-between text-[11px] font-mono text-[#10B981]">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
-                      <span>WebSocket PCM Audio Stream: 16kHz Mono</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span>Latency: <strong>198ms (-60%)</strong></span>
-                      <span>Packets: <strong>{benchmarkChunks * 4}</strong></span>
-                      <span className="text-white/60">Coverage: 97.8% PASS</span>
-                    </div>
-                  </div>
-                )}
-
-                <pre className="p-4 sm:p-6 text-xs sm:text-sm font-mono leading-relaxed overflow-x-auto text-[#F4F0EA]/90 max-h-[500px]">
-                  <code>{activeSdk.code}</code>
-                </pre>
-              </div>
-            </div>
-
-            {/* Complete Skills & Education Row from Resume */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-[#111318]/15">
-              <div className="p-4 sm:p-5 rounded-xl bg-white/80 border border-[#111318]/10">
-                <div className="font-mono text-xs uppercase text-[#FF4F1F] font-semibold">
-                  Mobile
-                </div>
-                <div className="font-bold text-sm sm:text-base mt-1">
-                  Flutter & Native OS
-                </div>
-                <p className="text-xs sm:text-sm text-[#111318]/75 mt-1.5 leading-relaxed">
-                  Flutter, Dart, iOS (Swift, WidgetKit), Android (Kotlin),
-                  Platform Channels, BLoC, Riverpod, Provider, GetX, MVC/MVVM.
-                </p>
-              </div>
-
-              <div className="p-4 sm:p-5 rounded-xl bg-white/80 border border-[#111318]/10">
-                <div className="font-mono text-xs uppercase text-[#FF4F1F] font-semibold">
-                  Backend & Real-Time
-                </div>
-                <div className="font-bold text-sm sm:text-base mt-1">
-                  Go, Supabase & Sockets
-                </div>
-                <p className="text-xs sm:text-sm text-[#111318]/75 mt-1.5 leading-relaxed">
-                  Golang, WebSockets, WebRTC, Supabase, Firebase, REST, GraphQL,
-                  PostgreSQL (Prisma), React.
-                </p>
-              </div>
-
-              <div className="p-4 sm:p-5 rounded-xl bg-white/80 border border-[#111318]/10">
-                <div className="font-mono text-xs uppercase text-[#FF4F1F] font-semibold">
-                  DevOps & Analytics
-                </div>
-                <div className="font-bold text-sm sm:text-base mt-1">
-                  CI/CD & Retention
-                </div>
-                <p className="text-xs sm:text-sm text-[#111318]/75 mt-1.5 leading-relaxed">
-                  Fastlane, GitHub Actions, Docker, Jenkins, Mixpanel,
-                  CleverTap, AppsFlyer, Firebase Crashlytics, Sentry, SonarQube.
-                </p>
-              </div>
-
-              <div className="p-4 sm:p-5 rounded-xl bg-white/80 border border-[#111318]/10">
-                <div className="font-mono text-xs uppercase text-[#FF4F1F] font-semibold">
-                  Education
-                </div>
-                <div className="font-bold text-sm sm:text-base mt-1">
-                  B.Tech in Computer Science
-                </div>
-                <p className="text-xs sm:text-sm text-[#111318]/75 mt-1.5 leading-relaxed">
-                  Sri Venkateshwara College of Engineering, Bengaluru (2017 to
-                  2021).
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ===================================================================
-            ACT VI: CONTACT & RESUME (Scrollcraft Device: Spotlight Close)
-            =================================================================== */}
-        <section
-          id="contact"
-          data-sc-spotlight="contact"
-          className="py-20 sm:py-32 bg-[#07080B] text-[#F4F0EA] border-t border-[#F4F0EA]/10"
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-8 text-center space-y-6 sm:space-y-8">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#10B981]/15 border border-[#10B981]/30 font-mono text-xs text-[#10B981]">
-              <span className="w-2 h-2 rounded-full bg-[#10B981]" />
-              <span>Open to Senior and Lead Mobile Engineering Roles</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-6xl font-bold tracking-tight">
-              Let&apos;s build your next mobile app.
-            </h2>
-
-            <p className="text-sm sm:text-lg text-[#9DA4B0] max-w-xl mx-auto leading-relaxed">
-              Based in Bengaluru, India. Reach out directly by email or phone,
-              or download my resume below.
-            </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-              <a
-                href={`mailto:${PROFILE_DATA.email}`}
-                className="px-5 sm:px-6 py-3 sm:py-3.5 min-h-[44px] flex items-center justify-center rounded-xl bg-[#FF4F1F] text-[#F4F0EA] font-medium text-xs sm:text-base hover:bg-[#e04318] active:bg-[#cc3912] transition-colors"
-              >
-                {PROFILE_DATA.email}
-              </a>
-              <button
-                type="button"
-                onClick={() => setIsResumeOpen(true)}
-                className="px-5 sm:px-6 py-3 sm:py-3.5 min-h-[44px] flex items-center justify-center rounded-xl border border-[#FF4F1F]/40 bg-[#FF4F1F]/15 font-mono text-xs sm:text-sm text-[#FF4F1F] hover:bg-[#FF4F1F]/25 active:bg-[#FF4F1F]/35 transition-colors"
-              >
-                View Verified Resume
-              </button>
-              <a
-                href={PROFILE_DATA.resumeUrl}
-                download="Bhanu_Pratap_Resume.pdf"
-                className="px-5 sm:px-6 py-3 sm:py-3.5 min-h-[44px] flex items-center justify-center rounded-xl border border-[#F4F0EA]/20 font-mono text-xs sm:text-sm hover:bg-[#F4F0EA]/10 transition-colors"
-              >
-                Download Resume PDF
-              </a>
-              <a
-                href={`tel:${PROFILE_DATA.phone.replace(/\s+/g, '')}`}
-                className="px-5 sm:px-6 py-3 sm:py-3.5 min-h-[44px] flex items-center justify-center rounded-xl border border-[#F4F0EA]/20 font-mono text-xs sm:text-sm hover:bg-[#F4F0EA]/10 transition-colors"
-              >
-                {PROFILE_DATA.phone}
-              </a>
-            </div>
-
-            <div className="pt-8 sm:pt-10 border-t border-[#F4F0EA]/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-[#9DA4B0]">
-              <div>Bhanu Pratap, Bengaluru, India</div>
-              <div className="flex items-center gap-6">
                 <a
-                  href={PROFILE_DATA.github}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-[#F4F0EA] min-h-[44px] flex items-center"
+                  href={PROFILE_DATA.resumeUrl}
+                  download="Bhanu_Pratap_Resume.pdf"
+                  className="hover:text-white transition-colors"
                 >
-                  GitHub: ibhanu
-                </a>
-                <a
-                  href={PROFILE_DATA.linkedin}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-[#F4F0EA] min-h-[44px] flex items-center"
-                >
-                  LinkedIn: itsbhanupratap
+                  Resume PDF
                 </a>
               </div>
             </div>
@@ -1241,43 +1008,19 @@ export default function BhanuDeveloperPortfolio() {
         </section>
       </main>
 
-      {/* FLOATING 3D INTERACTION HUD */}
-      <aside
-        aria-label="3D Controls"
-        className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-30 flex items-center gap-2 p-1.5 rounded-full bg-[#07080B]/90 border border-[#F4F0EA]/15 backdrop-blur-md shadow-2xl"
-      >
-        <button
-          type="button"
-          onClick={() => setOrbitMode(!orbitMode)}
-          className={`px-3 sm:px-3.5 py-1.5 min-h-[44px] rounded-full text-[11px] sm:text-xs font-mono transition-colors flex items-center gap-2 ${
-            orbitMode
-              ? 'bg-[#FF4F1F] text-white font-medium shadow-md shadow-[#FF4F1F]/20'
-              : 'text-[#9DA4B0] hover:text-[#F4F0EA]'
-          }`}
-          title={orbitMode ? 'Click to re-enable scroll camera' : 'Click to inspect phones in 3D'}
-        >
-          <span
-            className={`w-2 h-2 rounded-full ${
-              orbitMode ? 'bg-white animate-pulse' : 'bg-[#FF4F1F]'
-            }`}
-          />
-          <span>{orbitMode ? '3D Orbit: Active' : 'Inspect 3D'}</span>
-        </button>
-      </aside>
-
-      {/* RESUME VIEWER MODAL */}
+      {/* 10. REUSABLE RESUME MODAL */}
       <ResumeModal
         isOpen={isResumeOpen}
         onClose={() => setIsResumeOpen(false)}
       />
 
-      {/* FULL-SCREEN TOUCH LIGHTBOX */}
+      {/* 11. REUSABLE IMAGE LIGHTBOX */}
       <ImageLightbox
-        isOpen={lightboxState.isOpen}
-        onClose={() => setLightboxState((prev) => ({ ...prev, isOpen: false }))}
-        images={lightboxState.images}
-        currentIndex={lightboxState.index}
-        onNavigate={(newIdx) => setLightboxState((prev) => ({ ...prev, index: newIdx }))}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        images={lightboxImages}
+        currentIndex={lightboxIndex}
+        onNavigate={setLightboxIndex}
       />
     </div>
   );

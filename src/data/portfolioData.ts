@@ -67,7 +67,7 @@ export const PROFILE_DATA = {
   github: "https://github.com/ibhanu",
   linkedin: "https://linkedin.com/in/itsbhanupratap",
   resumeUrl: "/Bhanu_Pratap_Resume.pdf",
-  heroStatement: "We make high-scale mobile architecture feel effortless.",
+  heroStatement: "We engineer high-scale mobile architecture with measured precision.",
   studioPitch:
     "Available for Staff/Principal Mobile Engineering Leadership & Select 0-to-1 Product Architecture Partnerships.",
 };
@@ -333,7 +333,7 @@ export const MOBILE_APPS: MobileAppProject[] = [
     role: "Creator & Lead Architect",
     period: "Open Source Flagship",
     category: "OPEN-SOURCE PRODUCT",
-    tagline: "Find Your Frequency — Full-Stack Flutter + Supabase Dating Engine",
+    tagline: "Find Your Frequency: Full-Stack Flutter + Supabase Dating Engine",
     description:
       "Modern open-source dating application engineered with clean architecture (Data / Domain / Presentation), custom 60 FPS card-swipe gesture physics, real-time Supabase messaging, and freemium paywall workflows.",
     metrics: [
@@ -374,7 +374,7 @@ export const MOBILE_APPS: MobileAppProject[] = [
   },
   {
     id: "mango",
-    name: "Mango — Mind Architected",
+    name: "Mango: Mind Architected",
     role: "Creator & Lead Architect",
     period: "Open Source Flagship",
     category: "OPEN-SOURCE PRODUCT",

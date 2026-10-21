@@ -15,6 +15,7 @@
 
 # agents & skills
 .agents/
+.taste-skill/
 
 # misc
 .DS_Store
