@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { RoundedBox, useTexture, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
-
-const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
 export interface DeveloperStage3DProps {
   scrollProgressRef: React.MutableRefObject<number>;
@@ -13,6 +11,43 @@ export interface DeveloperStage3DProps {
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
   activeScreenOverrides: Record<string, number>;
   orbitMode?: boolean;
+}
+
+// WebGL context detection
+function isWebGLAvailable(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+    );
+  } catch {
+    return false;
+  }
+}
+
+// Error Boundary for WebGL failures and headless browsers
+class WebGLErrorBoundary extends React.Component<
+  { fallback?: React.ReactNode; children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { fallback?: React.ReactNode; children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error) {
+    console.warn('WebGL initialization failed, falling back gracefully:', error);
+  }
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || null;
+    }
+    return this.props.children;
+  }
 }
 
 const SCREENSHOT_PATHS = [
@@ -34,9 +69,19 @@ const SCREENSHOT_PATHS = [
 // 3D SPLINE CURVES: ELEGANT ARCHITECTURAL DATA FLOWS
 // ============================================================================
 
-function SplineDataRibbons({ accentColor }: { accentColor: string }) {
+function SplineDataRibbons({ accentColor, isMobile }: { accentColor: string; isMobile: boolean }) {
   const pointsRef = useRef<THREE.Points>(null);
   const curves = useMemo(() => {
+    if (isMobile) {
+      return [
+        new THREE.CatmullRomCurve3([
+          new THREE.Vector3(-0.8, -1.8, -0.8),
+          new THREE.Vector3(0.6, -0.6, 0.4),
+          new THREE.Vector3(-0.4, 0.8, -0.2),
+          new THREE.Vector3(0.5, 1.8, 0.3),
+        ]),
+      ];
+    }
     return [
       new THREE.CatmullRomCurve3([
         new THREE.Vector3(0.6, -1.8, -0.6),
@@ -52,16 +97,15 @@ function SplineDataRibbons({ accentColor }: { accentColor: string }) {
         new THREE.Vector3(2.8, 1.9, 0.3),
       ]),
     ];
-  }, []);
+  }, [isMobile]);
 
   const tubeGeometries = useMemo(() => {
-    return curves.map((c) => new THREE.TubeGeometry(c, 64, 0.014, 8, false));
+    return curves.map((c) => new THREE.TubeGeometry(c, 48, 0.012, 6, false));
   }, [curves]);
 
-  const particleCount = 40;
+  const particleCount = isMobile ? 20 : 40;
   const particlePositions = useMemo(() => {
-    const arr = new Float32Array(particleCount * 3);
-    return arr;
+    return new Float32Array(particleCount * 3);
   }, [particleCount]);
 
   useFrame(({ clock }) => {
@@ -85,8 +129,7 @@ function SplineDataRibbons({ accentColor }: { accentColor: string }) {
           <meshBasicMaterial
             color={accentColor}
             transparent
-            opacity={0.35}
-            wireframe={false}
+            opacity={0.3}
           />
         </mesh>
       ))}
@@ -100,9 +143,9 @@ function SplineDataRibbons({ accentColor }: { accentColor: string }) {
         </bufferGeometry>
         <pointsMaterial
           color={accentColor}
-          size={0.07}
+          size={isMobile ? 0.05 : 0.07}
           transparent
-          opacity={0.85}
+          opacity={0.8}
           sizeAttenuation
         />
       </points>
@@ -137,7 +180,7 @@ function PhoneHandset3D({
   return (
     <group position={position} rotation={rotation} scale={scale}>
       {/* Brushed Aluminum / Dark Slate Body */}
-      <RoundedBox args={[2.08, 4.28, 0.16]} radius={0.22} smoothness={5}>
+      <RoundedBox args={[2.08, 4.28, 0.16]} radius={0.22} smoothness={4}>
         <meshStandardMaterial
           color="#171B24"
           metalness={0.82}
@@ -146,7 +189,7 @@ function PhoneHandset3D({
       </RoundedBox>
 
       {/* Subtle Rim Accent */}
-      <RoundedBox args={[2.11, 4.31, 0.12]} radius={0.23} smoothness={4}>
+      <RoundedBox args={[2.11, 4.31, 0.12]} radius={0.23} smoothness={3}>
         <meshStandardMaterial
           color={accentColor}
           metalness={0.65}
@@ -176,7 +219,7 @@ function PhoneHandset3D({
 }
 
 // ============================================================================
-// MAIN SCENE: SCROLL-LINKED 3D PRODUCT STAGE
+// MAIN SCENE: SCROLL-LINKED 3D PRODUCT STAGE (DESKTOP & MOBILE RESPONSIVE)
 // ============================================================================
 
 function DeveloperShowcaseScene({
@@ -186,7 +229,7 @@ function DeveloperShowcaseScene({
   activeScreenOverrides,
   orbitMode = false,
 }: DeveloperStage3DProps) {
-  const { camera, scene } = useThree();
+  const { camera, scene, viewport } = useThree();
   const rawTextures = useTexture(SCREENSHOT_PATHS);
 
   const textures = useMemo(() => {
@@ -196,6 +239,8 @@ function DeveloperShowcaseScene({
     });
     return rawTextures;
   }, [rawTextures]);
+
+  const isMobile = viewport.width < 5.2;
 
   const heroGroupRef = useRef<THREE.Group>(null);
   const bigbangRef = useRef<THREE.Group>(null);
@@ -229,14 +274,19 @@ function DeveloperShowcaseScene({
     );
     w.paper = THREE.MathUtils.lerp(w.paper, sec === 'sdks' ? 1 : 0, damp);
 
+    // Responsive position offsets based on viewport width
+    const targetBaseX = isMobile ? 0 : 2.15;
+    const targetScaleMultiplier = isMobile ? Math.min(0.58, viewport.width * 0.17) : 1;
+
     // Camera handling: automatic smooth lerp if not in manual orbit mode
     if (!orbitMode) {
-      const targetCamX = ptr.x * 0.28;
-      const targetCamY = ptr.y * 0.18;
+      const targetCamX = isMobile ? 0 : ptr.x * 0.28;
+      const targetCamY = isMobile ? 0 : ptr.y * 0.18;
+      const targetCamZ = isMobile ? 6.8 : 6.2;
       camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCamX, damp);
       camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetCamY, damp);
-      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 6.2, damp);
-      camera.lookAt(0.75, 0, 0);
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetCamZ, damp);
+      camera.lookAt(isMobile ? 0 : 0.75, 0, 0);
     }
 
     // Background color transition for Act V (Paper ground shift on SDKs section)
@@ -245,23 +295,25 @@ function DeveloperShowcaseScene({
     bgColorRef.current.lerpColors(darkHex, paperHex, w.paper);
     scene.background = bgColorRef.current;
 
-    // 1. HERO FAN OF 3 PHONES (Act I: Intro)
+    // 1. HERO FAN OF PHONES (Act I: Intro)
     if (heroGroupRef.current) {
       const v = w.intro;
       heroGroupRef.current.visible = v > 0.01;
       heroGroupRef.current.position.set(
-        2.15 + (1 - v) * 1.6,
-        -0.1 + Math.sin(t * 1.2) * 0.05 - (1 - v) * 0.8,
-        0
+        targetBaseX + (1 - v) * (isMobile ? 0 : 1.6),
+        (isMobile ? -0.4 : -0.1) + Math.sin(t * 1.2) * 0.05 - (1 - v) * 0.8,
+        isMobile ? -0.8 : 0
       );
       if (!orbitMode) {
         heroGroupRef.current.rotation.set(
-          ptr.y * 0.08,
-          -0.22 + ptr.x * 0.16,
+          isMobile ? 0.04 : ptr.y * 0.08,
+          isMobile ? 0 : -0.22 + ptr.x * 0.16,
           0
         );
       }
-      heroGroupRef.current.scale.setScalar(Math.max(0.001, v * 0.84));
+      heroGroupRef.current.scale.setScalar(
+        Math.max(0.001, v * 0.84 * targetScaleMultiplier)
+      );
     }
 
     // 2. ACT II: BIGBANG.SOCIAL PHONE
@@ -269,18 +321,20 @@ function DeveloperShowcaseScene({
       const v = w.bigbang;
       bigbangRef.current.visible = v > 0.01;
       bigbangRef.current.position.set(
-        2.25 + (1 - v) * 1.5,
-        -0.08 + Math.sin(t * 1.3) * 0.05 + (1 - v) * -0.9,
-        0.15
+        (isMobile ? 0 : 2.25) + (1 - v) * (isMobile ? 0 : 1.5),
+        (isMobile ? -0.35 : -0.08) + Math.sin(t * 1.3) * 0.05 + (1 - v) * -0.9,
+        isMobile ? -0.9 : 0.15
       );
       if (!orbitMode) {
         bigbangRef.current.rotation.set(
-          ptr.y * 0.08,
-          -0.26 + ptr.x * 0.18,
+          isMobile ? 0.03 : ptr.y * 0.08,
+          isMobile ? 0 : -0.26 + ptr.x * 0.18,
           0.02
         );
       }
-      bigbangRef.current.scale.setScalar(Math.max(0.001, v * 0.94));
+      bigbangRef.current.scale.setScalar(
+        Math.max(0.001, v * 0.94 * targetScaleMultiplier)
+      );
     }
 
     // 3. ACT III: UNDER 25 UNIVERSE PHONE
@@ -288,18 +342,20 @@ function DeveloperShowcaseScene({
       const v = w.under25;
       under25Ref.current.visible = v > 0.01;
       under25Ref.current.position.set(
-        2.25 + (1 - v) * 1.5,
-        -0.08 + Math.cos(t * 1.3) * 0.05 + (1 - v) * -0.9,
-        0.15
+        (isMobile ? 0 : 2.25) + (1 - v) * (isMobile ? 0 : 1.5),
+        (isMobile ? -0.35 : -0.08) + Math.cos(t * 1.3) * 0.05 + (1 - v) * -0.9,
+        isMobile ? -0.9 : 0.15
       );
       if (!orbitMode) {
         under25Ref.current.rotation.set(
-          ptr.y * 0.08,
-          -0.26 + ptr.x * 0.18,
+          isMobile ? 0.03 : ptr.y * 0.08,
+          isMobile ? 0 : -0.26 + ptr.x * 0.18,
           -0.02
         );
       }
-      under25Ref.current.scale.setScalar(Math.max(0.001, v * 0.94));
+      under25Ref.current.scale.setScalar(
+        Math.max(0.001, v * 0.94 * targetScaleMultiplier)
+      );
     }
 
     // 4. ACT IV: AURA & MANGO OPEN-SOURCE PAIR
@@ -309,32 +365,36 @@ function DeveloperShowcaseScene({
       mangoRef.current.visible = v > 0.01;
 
       auraRef.current.position.set(
-        1.65 + (1 - v) * 1.5,
-        -0.02 + Math.sin(t * 1.4) * 0.05,
-        0.25
+        (isMobile ? -0.65 : 1.65) + (1 - v) * (isMobile ? 0 : 1.5),
+        (isMobile ? -0.3 : -0.02) + Math.sin(t * 1.4) * 0.05,
+        isMobile ? -0.7 : 0.25
       );
       if (!orbitMode) {
         auraRef.current.rotation.set(
-          ptr.y * 0.08,
-          -0.18 + ptr.x * 0.15,
+          isMobile ? 0.02 : ptr.y * 0.08,
+          isMobile ? 0.12 : -0.18 + ptr.x * 0.15,
           0.03
         );
       }
-      auraRef.current.scale.setScalar(Math.max(0.001, v * 0.82));
+      auraRef.current.scale.setScalar(
+        Math.max(0.001, v * 0.82 * targetScaleMultiplier)
+      );
 
       mangoRef.current.position.set(
-        2.9 + (1 - v) * 1.8,
-        -0.2 + Math.cos(t * 1.4) * 0.05,
-        -0.3
+        (isMobile ? 0.65 : 2.9) + (1 - v) * (isMobile ? 0 : 1.8),
+        (isMobile ? -0.4 : -0.2) + Math.cos(t * 1.4) * 0.05,
+        isMobile ? -1.1 : -0.3
       );
       if (!orbitMode) {
         mangoRef.current.rotation.set(
-          ptr.y * 0.08,
-          -0.3 + ptr.x * 0.15,
+          isMobile ? 0.02 : ptr.y * 0.08,
+          isMobile ? -0.14 : -0.3 + ptr.x * 0.15,
           -0.03
         );
       }
-      mangoRef.current.scale.setScalar(Math.max(0.001, v * 0.8));
+      mangoRef.current.scale.setScalar(
+        Math.max(0.001, v * 0.8 * targetScaleMultiplier)
+      );
     }
   });
 
@@ -370,10 +430,10 @@ function DeveloperShowcaseScene({
       <directionalLight position={[-6, -3, 4]} intensity={1.1} color={activeColor} />
 
       {/* 3D SPLINE TELEMETRY CURVES */}
-      <SplineDataRibbons accentColor={activeColor} />
+      <SplineDataRibbons accentColor={activeColor} isMobile={isMobile} />
 
       {/* ACT I: HERO TRIO OF SHIPPED APPS */}
-      <group ref={heroGroupRef} position={[1.75, 0, 0]}>
+      <group ref={heroGroupRef}>
         <PhoneHandset3D
           textures={textures}
           screenIndex={3}
@@ -401,7 +461,7 @@ function DeveloperShowcaseScene({
       </group>
 
       {/* ACT II: BIGBANG.SOCIAL LIVE HANDSET */}
-      <group ref={bigbangRef} position={[1.85, 0, 0]}>
+      <group ref={bigbangRef}>
         <PhoneHandset3D
           textures={textures}
           screenIndex={bbIdx}
@@ -410,7 +470,7 @@ function DeveloperShowcaseScene({
       </group>
 
       {/* ACT III: UNDER 25 UNIVERSE LIVE HANDSET */}
-      <group ref={under25Ref} position={[1.85, 0, 0]}>
+      <group ref={under25Ref}>
         <PhoneHandset3D
           textures={textures}
           screenIndex={3 + u25Idx}
@@ -419,14 +479,14 @@ function DeveloperShowcaseScene({
       </group>
 
       {/* ACT IV: AURA & MANGO OPEN-SOURCE HANDSETS */}
-      <group ref={auraRef} position={[1.15, 0.1, 0.2]}>
+      <group ref={auraRef}>
         <PhoneHandset3D
           textures={textures}
           screenIndex={6 + auraIdx}
           accentColor="#FF4F1F"
         />
       </group>
-      <group ref={mangoRef} position={[2.55, -0.15, -0.35]}>
+      <group ref={mangoRef}>
         <PhoneHandset3D
           textures={textures}
           screenIndex={9 + mangoIdx}
@@ -447,23 +507,33 @@ function DeveloperShowcaseScene({
 }
 
 export function ChronographWorld3D(props: DeveloperStage3DProps) {
+  const [supported, setSupported] = useState(false);
+
+  useEffect(() => {
+    setSupported(isWebGLAvailable());
+  }, []);
+
+  if (!supported) return null;
+
   return (
-    <div
-      className={`fixed inset-0 z-0 ${
-        props.orbitMode ? 'pointer-events-auto cursor-grab active:cursor-grabbing' : 'pointer-events-none'
-      }`}
-      aria-hidden={!props.orbitMode}
-    >
-      <Canvas
-        dpr={[1, 1.75]}
-        camera={{ position: [0, 0, 6.2], fov: 38, near: 0.1, far: 50 }}
-        gl={{ antialias: true, powerPreference: 'high-performance' }}
+    <WebGLErrorBoundary fallback={null}>
+      <div
+        className={`fixed inset-0 z-0 ${
+          props.orbitMode ? 'pointer-events-auto cursor-grab active:cursor-grabbing' : 'pointer-events-none'
+        }`}
+        aria-hidden={!props.orbitMode}
       >
-        <React.Suspense fallback={null}>
-          <DeveloperShowcaseScene {...props} />
-        </React.Suspense>
-      </Canvas>
-    </div>
+        <Canvas
+          dpr={[1, typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 1.75) : 1.5]}
+          camera={{ position: [0, 0, 6.2], fov: 38, near: 0.1, far: 50 }}
+          gl={{ antialias: true, powerPreference: 'high-performance' }}
+        >
+          <React.Suspense fallback={null}>
+            <DeveloperShowcaseScene {...props} />
+          </React.Suspense>
+        </Canvas>
+      </div>
+    </WebGLErrorBoundary>
   );
 }
 

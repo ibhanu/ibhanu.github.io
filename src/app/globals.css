@@ -22,6 +22,7 @@ html {
   scroll-behavior: smooth;
   background-color: var(--bg-dark);
   color: var(--text-light);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -29,6 +30,19 @@ body {
   color: var(--text-light);
   overflow-x: hidden;
   font-feature-settings: "ss01" on, "cv01" on;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 ::selection {
