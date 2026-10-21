@@ -421,9 +421,9 @@ export default function BhanuDeveloperPortfolio() {
               </div>
               <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {[
-                  { url: '/screenshots/bigbang-2.jpg', label: 'BigBang.Social — Earnings' },
-                  { url: '/screenshots/under25-1.jpg', label: 'Under 25 — Missions' },
-                  { url: '/screenshots/aura-discovery.png', label: 'Aura — Discovery Deck' },
+                  { url: '/screenshots/bigbang-2.webp', label: 'BigBang.Social — Earnings' },
+                  { url: '/screenshots/under25-1.webp', label: 'Under 25 — Missions' },
+                  { url: '/screenshots/aura-discovery.webp', label: 'Aura — Discovery Deck' },
                 ].map((item, idx, arr) => (
                   <button
                     key={idx}
