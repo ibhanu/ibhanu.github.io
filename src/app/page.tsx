@@ -11,7 +11,6 @@ import ResumeModal from '@/components/ResumeModal';
 import ImageLightbox from '@/components/ImageLightbox';
 import StickyScrollShowcase from '@/components/StickyScrollShowcase';
 import IPhoneMockup from '@/components/IPhoneMockup';
-import IPhone3DModal from '@/components/IPhone3DModal';
 import {
   Menu,
   X,
@@ -20,15 +19,12 @@ import {
   Terminal,
   ExternalLink,
   ArrowRight,
-  RotateCcw,
 } from 'lucide-react';
 
 export default function BhanuDeveloperPortfolio() {
   const [selectedSdkTab, setSelectedSdkTab] = useState(0);
   const [activeArchLayer, setActiveArchLayer] = useState(0);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
-  const [is3DModalOpen, setIs3DModalOpen] = useState(false);
-  const [selected3DScreen, setSelected3DScreen] = useState<'bigbang' | 'under25' | 'sarvam' | 'aura'>('bigbang');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -398,19 +394,6 @@ export default function BhanuDeveloperPortfolio() {
                   appName="BigBang.Social Production Handset"
                 />
               </div>
-
-              {/* Interactive 3D Hardware Inspector Trigger */}
-              <button
-                type="button"
-                onClick={() => {
-                  setSelected3DScreen('bigbang');
-                  setIs3DModalOpen(true);
-                }}
-                className="mt-4 px-4 py-2.5 rounded-xl text-[13px] font-semibold bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white transition-colors flex items-center gap-2"
-              >
-                <RotateCcw className="w-4 h-4 text-[#D93800]" />
-                <span>Inspect iPhone 18 Pro Max Burgundy 3D</span>
-              </button>
             </div>
           </div>
         </section>
@@ -576,18 +559,6 @@ export default function BhanuDeveloperPortfolio() {
                   <p className="text-sm text-[#A2A3B0] pt-1">
                     Screens: Brand Collaborations Hub, Social OAuth Analytics Pipeline, and Automated DigiLocker KYC settlement.
                   </p>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelected3DScreen('bigbang');
-                      setIs3DModalOpen(true);
-                    }}
-                    className="w-full py-2.5 px-3 rounded-lg text-[13px] font-semibold bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white transition-colors flex items-center justify-center gap-2"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5 text-[#D93800]" />
-                    <span>Inspect BigBang.Social on iPhone 18 Pro Max 3D</span>
-                  </button>
                 </div>
               </div>
             </div>
@@ -678,18 +649,6 @@ export default function BhanuDeveloperPortfolio() {
                   <p className="text-sm text-[#A2A3B0] pt-1">
                     Screens: Student Gigs Feed, 200ms Real-Time Campus Spaces, and Interactive Collectibles Wallet.
                   </p>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelected3DScreen('under25');
-                      setIs3DModalOpen(true);
-                    }}
-                    className="w-full py-2.5 px-3 rounded-lg text-[13px] font-semibold bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white transition-colors flex items-center justify-center gap-2"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5 text-[#10B981]" />
-                    <span>Inspect Under 25 on iPhone 18 Pro Max 3D</span>
-                  </button>
                 </div>
 
                 {/* Right Column: Systems Engineering Details with Scroll-Driven Active Card */}
@@ -1249,13 +1208,6 @@ export default function BhanuDeveloperPortfolio() {
         images={lightboxImages}
         currentIndex={lightboxIndex}
         onNavigate={setLightboxIndex}
-      />
-
-      {/* 12. 3D IPHONE HARDWARE INSPECTOR MODAL */}
-      <IPhone3DModal
-        isOpen={is3DModalOpen}
-        onClose={() => setIs3DModalOpen(false)}
-        initialScreen={selected3DScreen}
       />
     </div>
   );
