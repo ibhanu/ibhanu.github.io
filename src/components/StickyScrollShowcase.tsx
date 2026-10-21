@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import IPhoneMockup from './IPhoneMockup';
-import { ArrowRight, Sparkles, Smartphone, Code2, Layers } from 'lucide-react';
+import { ArrowRight, Sparkles, Smartphone, Layers, CheckCircle2 } from 'lucide-react';
 
 interface StickyShowcaseItem {
   id: string;
@@ -25,26 +25,26 @@ const SHOWCASE_ITEMS: StickyShowcaseItem[] = [
     role: 'Tech Lead App · Collective Artists Network',
     headline: 'Creator Collaborations & Instant Invoicing',
     caption:
-      'Custom payment abstraction over Cashfree & Razorpay processing $5M+ in creator payouts across 500,000+ downloads.',
+      'Custom payment abstraction over Cashfree & Razorpay processing $5M+ in creator payouts across 500,000+ downloads with zero dropped transactions.',
     screenshotUrl: '/screenshots/bigbang-1.webp',
     accentColor: '#FF4F1F',
     metric: '$5M+',
     metricLabel: 'Annual creator payouts',
-    tags: ['Flutter', 'MethodChannels', 'DigiLocker KYC', 'Razorpay'],
+    tags: ['Flutter', 'MethodChannels', 'DigiLocker KYC', 'Razorpay', 'Fastlane'],
     linkId: 'bigbang',
   },
   {
     id: 'under-25',
     appName: 'Under 25 Universe',
-    role: 'Senior Flutter Dev · Student Platform',
+    role: 'Senior Flutter Dev · Student Super-App',
     headline: 'Real-Time Campus Missions & Collectibles',
     caption:
-      'WebSocket chat engine with background isolate serialization cutting latency from 500ms to 200ms for 400K+ students.',
+      'WebSocket chat engine with background isolate serialization cutting latency from 500ms to 200ms for 400K+ students and $20M+ platform earnings.',
     screenshotUrl: '/screenshots/under25-1.webp',
     accentColor: '#10B981',
     metric: '400K+',
     metricLabel: 'Active campus students',
-    tags: ['Flutter', 'WebSockets', 'Dart Isolates', '30+ Widget System'],
+    tags: ['Flutter', 'WebSockets', 'Dart Isolates', '30+ Widget System', 'A/B Tests'],
     linkId: 'under25',
   },
   {
@@ -53,12 +53,12 @@ const SHOWCASE_ITEMS: StickyShowcaseItem[] = [
     role: 'Creator & Lead Architect · Open Source',
     headline: '60 FPS Swipe Physics Discovery Deck',
     caption:
-      'Clean 3-Layer architecture (Data / Domain / Presentation) with custom spring card-swipe physics & Supabase Realtime.',
+      'Clean 3-Layer architecture (Data / Domain / Presentation) with custom spring card-swipe physics & real-time Supabase messaging.',
     screenshotUrl: '/screenshots/aura-discovery.webp',
     accentColor: '#FF4800',
     metric: '60 FPS',
-    metricLabel: 'Card gesture physics',
-    tags: ['Flutter 3.32', 'Dart 3.8', 'Supabase Realtime', 'Clean Arch'],
+    metricLabel: 'Spring gesture physics',
+    tags: ['Flutter 3.32', 'Dart 3.8', 'Supabase Realtime', 'Clean Arch', 'GetX'],
     linkId: 'opensource',
   },
   {
@@ -67,12 +67,12 @@ const SHOWCASE_ITEMS: StickyShowcaseItem[] = [
     role: 'Creator & Lead Architect · Open Source',
     headline: 'Parallax Affirmation & Native iOS Widgets',
     caption:
-      'Multi-layer sensor parallax background compositor, streak mascot system, and native iOS Home/Lockscreen WidgetKit bridge.',
+      'Multi-layer sensor parallax background compositor, streak mascot system, and native iOS Home/Lockscreen WidgetKit bridge via App Groups.',
     screenshotUrl: '/screenshots/mango-home.webp',
     accentColor: '#F59E0B',
     metric: 'Swift',
     metricLabel: 'Native iOS WidgetKit bridge',
-    tags: ['Flutter', 'iOS WidgetKit', 'Parallax Engine', 'Custom Shaders'],
+    tags: ['Flutter', 'iOS WidgetKit', 'Parallax Engine', 'Custom Shaders', 'Haptics'],
     linkId: 'opensource',
   },
 ];
@@ -81,9 +81,28 @@ export default function StickyScrollShowcase() {
   const containerRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+
+  // Smooth lerp state for momentum translation
+  const targetXRef = useRef(0);
+  const currentXRef = useRef(0);
 
   useEffect(() => {
     let raf = 0;
+    let isRunning = true;
+
+    const updatePhysics = () => {
+      // Exponential momentum smoothing
+      currentXRef.current += (targetXRef.current - currentXRef.current) * 0.14;
+
+      if (railRef.current) {
+        railRef.current.style.transform = `translate3d(${currentXRef.current.toFixed(2)}px, 0, 0)`;
+      }
+
+      if (isRunning) {
+        raf = requestAnimationFrame(updatePhysics);
+      }
+    };
 
     const handleScroll = () => {
       if (!containerRef.current || !railRef.current) return;
@@ -91,7 +110,6 @@ export default function StickyScrollShowcase() {
       const containerHeight = containerRef.current.offsetHeight;
       const windowHeight = window.innerHeight;
 
-      // Calculate normalized progress [0.0 to 1.0] while the pinned stage is active
       const totalScrollableDistance = containerHeight - windowHeight;
       if (totalScrollableDistance <= 0) return;
 
@@ -99,32 +117,27 @@ export default function StickyScrollShowcase() {
       const p = Math.max(0, Math.min(1, currentScroll / totalScrollableDistance));
       setProgress(p);
 
-      // Horizontal travel translation
+      const cardIdx = Math.min(SHOWCASE_ITEMS.length - 1, Math.max(0, Math.floor(p * (SHOWCASE_ITEMS.length + 0.5))));
+      setActiveCardIndex(cardIdx);
+
+      // Horizontal travel target
       const railWidth = railRef.current.scrollWidth;
       const windowWidth = window.innerWidth;
       const maxScrollX = Math.max(0, railWidth - windowWidth + 60);
 
-      const targetX = -(p * maxScrollX);
-      railRef.current.style.transform = `translate3d(${targetX.toFixed(2)}px, 0, 0)`;
+      targetXRef.current = -(p * maxScrollX);
     };
 
-    const onScroll = () => {
-      if (!raf) {
-        raf = requestAnimationFrame(() => {
-          handleScroll();
-          raf = 0;
-        });
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
     handleScroll();
+    raf = requestAnimationFrame(updatePhysics);
 
     return () => {
-      if (raf) cancelAnimationFrame(raf);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      isRunning = false;
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
     };
   }, []);
 
@@ -140,9 +153,12 @@ export default function StickyScrollShowcase() {
       {/* PINNED STAGE (Sticky Viewport Container) */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center bg-[#07080B]/90 backdrop-blur-xl border-y border-[#F4F0EA]/10">
         
-        {/* Subtle Ambient Radial Glow */}
+        {/* Subtle Ambient Radial Glow reacting to active card */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(circle_at_35%_50%,rgba(255,79,31,0.12),transparent_60%)]"
+          className="absolute inset-0 pointer-events-none transition-colors duration-700 opacity-30"
+          style={{
+            background: `radial-gradient(circle at 45% 50%, ${SHOWCASE_ITEMS[activeCardIndex]?.accentColor || '#FF4F1F'}30, transparent 65%)`,
+          }}
           aria-hidden="true"
         />
 
@@ -152,6 +168,14 @@ export default function StickyScrollShowcase() {
             className="h-full bg-gradient-to-r from-[#FF4F1F] via-[#F59E0B] to-[#10B981] transition-all duration-75"
             style={{ width: `${(progress * 100).toFixed(1)}%` }}
           />
+        </div>
+
+        {/* Floating Editorial Watermark Number */}
+        <div
+          className="absolute right-8 bottom-4 text-[12vw] font-black text-white/[0.025] select-none pointer-events-none font-mono"
+          aria-hidden="true"
+        >
+          0{activeCardIndex + 1}
         </div>
 
         {/* HORIZONTAL RAIL TRACK */}
@@ -187,79 +211,87 @@ export default function StickyScrollShowcase() {
           </div>
 
           {/* 2. PRODUCT CARDS WITH REAL IPHONE 15 PRO MODELS */}
-          {SHOWCASE_ITEMS.map((item, index) => (
-            <div
-              key={item.id}
-              className="flex-shrink-0 w-[88vw] sm:w-[620px] p-6 sm:p-8 rounded-3xl bg-[#0F1218]/85 border border-white/10 backdrop-blur-xl shadow-2xl flex flex-col lg:flex-row items-center gap-6 sm:gap-8 group hover:border-white/20 transition-colors"
-            >
-              {/* Left: Real iPhone 15 Pro Model */}
-              <div className="flex-shrink-0 w-[210px] sm:w-[250px] transform group-hover:scale-[1.02] transition-transform duration-300">
-                <IPhoneMockup
-                  screenshotUrl={item.screenshotUrl}
-                  alt={`${item.appName} — ${item.headline}`}
-                />
-              </div>
-
-              {/* Right: Architectural Content & Metric Plate */}
-              <div className="flex-1 space-y-4">
-                <div className="flex items-center justify-between gap-2">
-                  <span
-                    className="font-mono text-xs uppercase tracking-wider font-semibold"
-                    style={{ color: item.accentColor }}
-                  >
-                    0{index + 1} · {item.appName}
-                  </span>
-                  <a
-                    href={`#${item.linkId}`}
-                    className="text-xs font-mono text-[#9DA4B0] hover:text-[#F4F0EA] flex items-center gap-1 group-hover:translate-x-0.5 transition-all"
-                  >
-                    <span>Deep dive</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </a>
+          {SHOWCASE_ITEMS.map((item, index) => {
+            const isCurrent = activeCardIndex === index;
+            return (
+              <div
+                key={item.id}
+                className={`flex-shrink-0 w-[88vw] sm:w-[640px] p-6 sm:p-8 rounded-3xl bg-[#0F1218]/85 border backdrop-blur-xl shadow-2xl flex flex-col lg:flex-row items-center gap-6 sm:gap-8 transition-all duration-300 ${
+                  isCurrent
+                    ? 'border-white/30 scale-[1.01]'
+                    : 'border-white/10 opacity-90'
+                }`}
+              >
+                {/* Left: Real iPhone 15 Pro Model with Pointer-Reactive Glare */}
+                <div className="flex-shrink-0 w-[210px] sm:w-[250px] transform hover:scale-[1.02] transition-transform duration-300">
+                  <IPhoneMockup
+                    screenshotUrl={item.screenshotUrl}
+                    alt={`${item.appName} — ${item.headline}`}
+                    accentColor={item.accentColor}
+                  />
                 </div>
 
-                <div className="text-xs font-mono text-[#9DA4B0]">
-                  {item.role}
-                </div>
-
-                <h3 className="text-xl sm:text-2xl font-bold text-[#F4F0EA] tracking-tight leading-snug">
-                  {item.headline}
-                </h3>
-
-                <p className="text-xs sm:text-sm text-[#9DA4B0] leading-relaxed">
-                  {item.caption}
-                </p>
-
-                {/* Key Metric Badge */}
-                <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-                  <div>
-                    <div
-                      className="text-lg sm:text-xl font-bold font-mono"
+                {/* Right: Architectural Content & Metric Plate */}
+                <div className="flex-1 space-y-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <span
+                      className="font-mono text-xs uppercase tracking-wider font-semibold"
                       style={{ color: item.accentColor }}
                     >
-                      {item.metric}
-                    </div>
-                    <div className="text-[11px] font-mono text-[#9DA4B0]">
-                      {item.metricLabel}
-                    </div>
-                  </div>
-                  <Smartphone className="w-5 h-5 text-white/30" />
-                </div>
-
-                {/* Tech Stack Pills */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {item.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2.5 py-0.5 rounded-md text-[11px] font-mono bg-white/5 border border-white/10 text-white/80"
-                    >
-                      {tag}
+                      0{index + 1} · {item.appName}
                     </span>
-                  ))}
+                    <a
+                      href={`#${item.linkId}`}
+                      className="text-xs font-mono text-[#9DA4B0] hover:text-[#F4F0EA] flex items-center gap-1 hover:translate-x-0.5 transition-all"
+                    >
+                      <span>Deep dive</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+
+                  <div className="text-xs font-mono text-[#9DA4B0]">
+                    {item.role}
+                  </div>
+
+                  <h3 className="text-xl sm:text-2xl font-bold text-[#F4F0EA] tracking-tight leading-snug">
+                    {item.headline}
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-[#9DA4B0] leading-relaxed">
+                    {item.caption}
+                  </p>
+
+                  {/* Key Metric Badge */}
+                  <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                    <div>
+                      <div
+                        className="text-lg sm:text-xl font-bold font-mono"
+                        style={{ color: item.accentColor }}
+                      >
+                        {item.metric}
+                      </div>
+                      <div className="text-[11px] font-mono text-[#9DA4B0]">
+                        {item.metricLabel}
+                      </div>
+                    </div>
+                    <Smartphone className="w-5 h-5 text-white/30" />
+                  </div>
+
+                  {/* Tech Stack Pills */}
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {item.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2.5 py-0.5 rounded-md text-[11px] font-mono bg-white/5 border border-white/10 text-white/80"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* 3. CLOSING / TRANSITION RAIL CARD */}
           <div className="flex-shrink-0 w-[80vw] sm:w-[420px] p-7 sm:p-9 rounded-3xl bg-gradient-to-br from-[#12151D] to-[#0A0C10] border border-white/15 backdrop-blur-2xl shadow-2xl space-y-5 text-center flex flex-col justify-center items-center">
