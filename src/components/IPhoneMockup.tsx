@@ -89,14 +89,6 @@ export default function IPhoneMockup({
           </div>
         </div>
       </div>
-
-      {appName && (
-        <div className="mt-3 text-center">
-          <span className="inline-block px-3 py-1 rounded-full text-[13px] font-medium bg-[#161820] text-[#9596A3]">
-            {appName}
-          </span>
-        </div>
-      )}
     </div>
   );
 }

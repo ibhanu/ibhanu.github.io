@@ -525,7 +525,7 @@ export default function BhanuDeveloperPortfolio() {
                 </div>
 
                 {/* Right Column: Heroic Large Handset Screenshot fitted to viewport */}
-                <div className="lg:col-span-5 flex flex-col items-center justify-center space-y-2.5">
+                <div className="lg:col-span-5 flex flex-col items-center justify-center space-y-3">
                   <div className="text-xs sm:text-sm font-semibold text-white flex items-center justify-between w-full max-w-[320px]">
                     <span>Production Handset Display</span>
                     <span className="text-[13px] text-[#FF5520]">Screen {bigbangStep + 1} of 3</span>
@@ -539,37 +539,36 @@ export default function BhanuDeveloperPortfolio() {
                     <IPhoneMockup
                       screenshotUrl={MOBILE_APPS[0].screens[bigbangStep].url}
                       alt={MOBILE_APPS[0].screens[bigbangStep].label}
-                      appName="BigBang.Social Production"
                       className="h-full aspect-[1206/2622]"
                     />
                   </div>
 
-                  {/* Synchronized Screen Selector Pills */}
-                  <div className="flex items-center gap-1.5 pt-0.5 w-full max-w-[300px]">
-                    {MOBILE_APPS[0].screens.map((screen, idx) => {
+                  {/* Segmented Screen Selector Control */}
+                  <div className="w-full max-w-[320px] p-1 bg-[#14151D] rounded-xl flex items-center gap-1 border border-[#222430]">
+                    {['Hub', 'Analytics', 'Wallet'].map((label, idx) => {
                       const isActive = bigbangStep === idx;
                       return (
                         <button
-                          key={screen.id}
+                          key={label}
                           type="button"
                           onClick={() => {
                             setBigbangStep(idx);
-                            openLightbox(MOBILE_APPS[0].screens, idx);
                           }}
-                          className={`flex-1 py-1.5 px-2 rounded-lg text-[13px] font-semibold transition-colors truncate ${
+                          className={`flex-1 py-1.5 px-2.5 rounded-lg text-[13px] font-semibold transition-[background-color,color] duration-150 ${
                             isActive
                               ? 'bg-[#D93800] text-white'
-                              : 'bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white'
+                              : 'text-[#9A9BA8] hover:text-white hover:bg-[#1E202A]'
                           }`}
                         >
-                          {screen.label.replace(' BigBang.Social', '')}
+                          {label}
                         </button>
                       );
                     })}
                   </div>
 
-                  <p className="text-[13px] text-[#A2A3B0] text-center max-w-[280px]">
-                    Current Screen: <span className="text-white font-medium">{MOBILE_APPS[0].screens[bigbangStep].label}</span>. Tap to inspect.
+                  {/* Descriptive Context Caption */}
+                  <p className="text-[13px] text-[#8E8F9C] text-center max-w-[320px] leading-relaxed">
+                    {MOBILE_APPS[0].screens[bigbangStep].caption}
                   </p>
                 </div>
               </div>
@@ -605,37 +604,36 @@ export default function BhanuDeveloperPortfolio() {
                     <IPhoneMockup
                       screenshotUrl={MOBILE_APPS[1].screens[under25Step].url}
                       alt={MOBILE_APPS[1].screens[under25Step].label}
-                      appName="Under 25 Universe Production"
                       className="h-full aspect-[1206/2622]"
                     />
                   </div>
 
-                  {/* Synchronized Screen Selector Pills */}
-                  <div className="flex items-center gap-1.5 pt-0.5 w-full max-w-[300px]">
-                    {MOBILE_APPS[1].screens.map((screen, idx) => {
+                  {/* Segmented Screen Selector Control */}
+                  <div className="w-full max-w-[320px] p-1 bg-[#14151D] rounded-xl flex items-center gap-1 border border-[#222430]">
+                    {['Missions', 'Wallet', 'Spaces'].map((label, idx) => {
                       const isActive = under25Step === idx;
                       return (
                         <button
-                          key={screen.id}
+                          key={label}
                           type="button"
                           onClick={() => {
                             setUnder25Step(idx);
-                            openLightbox(MOBILE_APPS[1].screens, idx);
                           }}
-                          className={`flex-1 py-1.5 px-2 rounded-lg text-[13px] font-semibold transition-colors truncate ${
+                          className={`flex-1 py-1.5 px-2.5 rounded-lg text-[13px] font-semibold transition-[background-color,color] duration-150 ${
                             isActive
                               ? 'bg-[#10B981] text-white'
-                              : 'bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white'
+                              : 'text-[#9A9BA8] hover:text-white hover:bg-[#1E202A]'
                           }`}
                         >
-                          {screen.label.replace(' Under 25', '')}
+                          {label}
                         </button>
                       );
                     })}
                   </div>
 
-                  <p className="text-[13px] text-[#A2A3B0] text-center max-w-[280px]">
-                    Current Screen: <span className="text-white font-medium">{MOBILE_APPS[1].screens[under25Step].label}</span>. Tap to inspect.
+                  {/* Descriptive Context Caption */}
+                  <p className="text-[13px] text-[#8E8F9C] text-center max-w-[320px] leading-relaxed">
+                    {MOBILE_APPS[1].screens[under25Step].caption}
                   </p>
                 </div>
 
