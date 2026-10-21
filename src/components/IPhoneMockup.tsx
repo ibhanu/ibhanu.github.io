@@ -36,10 +36,10 @@ export default function IPhoneMockup({
       <div className="absolute -right-[3px] top-[120px] w-[3px] h-[54px] bg-[#2A2B32] rounded-r-[2px]" />
 
       {/* Grade 5 Titanium Chassis */}
-      <div className="relative rounded-[48px] p-[10px] bg-[#22242B] overflow-hidden">
+      <div className="relative rounded-[44px] sm:rounded-[48px] p-[8px] sm:p-[10px] bg-[#22242B] overflow-hidden h-full flex flex-col justify-center">
         
         {/* Inner Screen Bezel */}
-        <div className="relative rounded-[40px] overflow-hidden bg-black aspect-[1206/2622] flex flex-col justify-between">
+        <div className="relative rounded-[36px] sm:rounded-[40px] overflow-hidden bg-black aspect-[1206/2622] h-full w-auto max-w-full flex flex-col justify-between mx-auto">
           
           {/* iOS Status Bar Overlay */}
           <div

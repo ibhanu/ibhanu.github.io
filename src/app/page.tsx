@@ -406,52 +406,56 @@ export default function BhanuDeveloperPortfolio() {
           id="bigbang"
           ref={bigbangRef}
           data-sc-act="case-study"
-          className="scroll-mt-24 relative w-full lg:min-h-[260vh]"
+          className="scroll-mt-20 relative w-full lg:min-h-[200vh]"
         >
-          <div className="lg:sticky lg:top-0 min-h-[100dvh] flex flex-col justify-center max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-6 lg:py-10">
-            <div className="p-6 sm:p-10 lg:p-12 rounded-2xl bg-[#121318] space-y-8">
+          <div className="lg:sticky lg:top-16 w-full min-h-[calc(100dvh-4rem)] lg:h-[calc(100dvh-4rem)] flex flex-col justify-center px-6 sm:px-10 lg:px-14 py-4 sm:py-6 overflow-hidden bg-[#0C0D12]">
+            <div className="w-full max-w-[1440px] mx-auto h-full flex flex-col justify-center">
               
-              {/* Header Plate */}
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 bg-[#181920] p-6 sm:p-8 rounded-xl">
-                <div className="space-y-2">
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-display">
-                    BigBang.Social Super-App
-                  </h2>
-                  <p className="text-base text-[#E0E0E6] max-w-2xl leading-relaxed">
-                    Architected India&apos;s premier creator monetization platform by Collective Artists Network, handling 500,000+ downloads
-                    and processing over $5M+ annually through multi-gateway payment abstraction layers (Milestone {bigbangStep + 1} of 3).
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <a
-                    href="https://apps.apple.com/us/app/bigbang-social/id6450163388"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
-                  >
-                    <span>App Store</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                  <a
-                    href="https://play.google.com/store/apps/details?id=com.collectiveartists.bigbangsocial"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
-                  >
-                    <span>Google Play</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-
               {/* Architecture Highlights & Large Handset Display Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 xl:gap-12 items-center">
                 
-                {/* Left Column: Systems Engineering Details with Scroll-Driven Active Card */}
-                <div className="lg:col-span-7 space-y-4">
-                  <div className="flex items-center justify-between pb-1">
-                    <h3 className="text-xl sm:text-2xl font-bold text-white font-display">
+                {/* Left Column: Header + Systems Engineering Milestones */}
+                <div className="lg:col-span-7 flex flex-col justify-center space-y-3.5">
+                  
+                  {/* Header Plate */}
+                  <div className="space-y-2 pb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white font-display">
+                          BigBang.Social Super-App
+                        </h2>
+                      </div>
+
+                      <div className="flex items-center gap-2 self-start sm:self-auto">
+                        <a
+                          href="https://apps.apple.com/us/app/bigbang-social/id6450163388"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-3.5 py-1.5 rounded-lg text-[13px] font-semibold bg-[#1C1E26] text-white hover:bg-[#282A36] transition-colors flex items-center gap-1.5 border border-[#2A2C38]"
+                        >
+                          <span>App Store</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                        <a
+                          href="https://play.google.com/store/apps/details?id=com.collectiveartists.bigbangsocial"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-3.5 py-1.5 rounded-lg text-[13px] font-semibold bg-[#1C1E26] text-white hover:bg-[#282A36] transition-colors flex items-center gap-1.5 border border-[#2A2C38]"
+                        >
+                          <span>Google Play</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+                    </div>
+
+                    <p className="text-base text-[#D1D1DB] leading-relaxed max-w-2xl">
+                      Creator monetization platform by Collective Artists Network handling 500,000+ downloads &amp; $5M+ annual volume (Milestone {bigbangStep + 1} of 3).
+                    </p>
+                  </div>
+
+                  {/* Milestones Header */}
+                  <div className="flex items-center justify-between pt-0.5">
+                    <h3 className="text-base sm:text-lg font-bold text-white font-display">
                       Core Engineering Milestones
                     </h3>
                     <span className="text-[13px] text-[#A2A3B0] hidden sm:inline">
@@ -459,90 +463,89 @@ export default function BhanuDeveloperPortfolio() {
                     </span>
                   </div>
 
-                  <div className="space-y-3">
+                  {/* Interactive Milestone Cards */}
+                  <div className="space-y-2">
                     <div
                       onClick={() => setBigbangStep(0)}
-                      className={`p-5 sm:p-6 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
+                      className={`p-3 sm:p-3.5 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
                         bigbangStep === 0
-                          ? 'bg-[#1E2028] border-l-4 border-[#D93800] text-white'
-                          : 'bg-[#181920] opacity-75 hover:opacity-100 text-[#E0E0E6]'
+                          ? 'bg-[#181A22] border-l-4 border-[#D93800] text-white'
+                          : 'bg-[#12131A] opacity-75 hover:opacity-100 text-[#D1D1DB]'
                       }`}
                     >
-                      <h4 className="text-lg font-bold text-white">
+                      <h4 className="text-sm sm:text-base font-bold text-white">
                         Payment Abstraction Layer ($5M+ Annual Volume)
                       </h4>
-                      <p className="text-base leading-relaxed mt-1.5">
-                        Engineered a resilient multi-gateway adapter unifying Cashfree and Razorpay APIs.
-                        Zero dropped transactions during high-concurrency brand payout drops with automated retry fallbacks.
+                      <p className="text-base leading-relaxed mt-0.5 text-[#E0E0E6]">
+                        Engineered a resilient multi-gateway adapter unifying Cashfree and Razorpay APIs with zero dropped transactions.
                       </p>
                     </div>
 
                     <div
                       onClick={() => setBigbangStep(1)}
-                      className={`p-5 sm:p-6 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
+                      className={`p-3 sm:p-3.5 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
                         bigbangStep === 1
-                          ? 'bg-[#1E2028] border-l-4 border-[#D93800] text-white'
-                          : 'bg-[#181920] opacity-75 hover:opacity-100 text-[#E0E0E6]'
+                          ? 'bg-[#181A22] border-l-4 border-[#D93800] text-white'
+                          : 'bg-[#12131A] opacity-75 hover:opacity-100 text-[#D1D1DB]'
                       }`}
                     >
-                      <h4 className="text-lg font-bold text-white">
+                      <h4 className="text-sm sm:text-base font-bold text-white">
                         65% Crash Reduction via Memory Profiling
                       </h4>
-                      <p className="text-base leading-relaxed mt-1.5">
-                        Conducted low-level memory inspection in Xcode Instruments and Android Studio Profiler,
-                        eliminating texture retention leaks and dropping crash rates from 2.1% down to 0.7%.
+                      <p className="text-base leading-relaxed mt-0.5 text-[#E0E0E6]">
+                        Conducted low-level memory inspection in Instruments, eliminating texture retention leaks and dropping crash rates to 0.7%.
                       </p>
                     </div>
 
                     <div
                       onClick={() => setBigbangStep(2)}
-                      className={`p-5 sm:p-6 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
+                      className={`p-3 sm:p-3.5 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
                         bigbangStep === 2
-                          ? 'bg-[#1E2028] border-l-4 border-[#D93800] text-white'
-                          : 'bg-[#181920] opacity-75 hover:opacity-100 text-[#E0E0E6]'
+                          ? 'bg-[#181A22] border-l-4 border-[#D93800] text-white'
+                          : 'bg-[#12131A] opacity-75 hover:opacity-100 text-[#D1D1DB]'
                       }`}
                     >
-                      <h4 className="text-lg font-bold text-white">
-                        Deep OS Integrations & Automated KYC
+                      <h4 className="text-sm sm:text-base font-bold text-white">
+                        Deep OS Integrations &amp; Automated KYC
                       </h4>
-                      <p className="text-base leading-relaxed mt-1.5">
-                        Constructed custom platform channels bridging native iOS and Android media engines
-                        with Instagram Graph API, YouTube Data API, and DigiLocker instant verification.
+                      <p className="text-base leading-relaxed mt-0.5 text-[#E0E0E6]">
+                        Constructed custom platform channels bridging native media engines with Instagram APIs and DigiLocker instant verification.
                       </p>
                     </div>
                   </div>
 
                   {/* Tech Stack Tags */}
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {['Flutter', 'MethodChannels', 'DigiLocker KYC', 'Cashfree', 'Razorpay', 'Fastlane', 'Mixpanel', 'CleverTap'].map((t) => (
-                      <span key={t} className="px-3.5 py-1.5 rounded-lg text-sm bg-[#181920] text-[#F5F5F7]">
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    {['Flutter', 'MethodChannels', 'DigiLocker KYC', 'Cashfree', 'Razorpay', 'Fastlane', 'Mixpanel'].map((t) => (
+                      <span key={t} className="px-2.5 py-0.5 rounded-md text-[13px] bg-[#14151D] text-[#D1D1DB] border border-[#222430]">
                         {t}
                       </span>
                     ))}
                   </div>
                 </div>
 
-                {/* Right Column: Heroic Large Handset Screenshot synced to scroll */}
-                <div className="lg:col-span-5 flex flex-col items-center space-y-4">
-                  <div className="text-base font-semibold text-white flex items-center justify-between w-full max-w-[340px]">
+                {/* Right Column: Heroic Large Handset Screenshot fitted to viewport */}
+                <div className="lg:col-span-5 flex flex-col items-center justify-center space-y-2.5">
+                  <div className="text-xs sm:text-sm font-semibold text-white flex items-center justify-between w-full max-w-[320px]">
                     <span>Production Handset Display</span>
                     <span className="text-[13px] text-[#FF5520]">Screen {bigbangStep + 1} of 3</span>
                   </div>
 
-                  {/* Large High-Res Phone Frame */}
+                  {/* Handset Frame with Large Screenshot, constrained cleanly by viewport height */}
                   <div
                     onClick={() => openLightbox(MOBILE_APPS[0].screens, bigbangStep)}
-                    className="w-full max-w-[280px] sm:max-w-[310px] lg:max-w-[330px] cursor-pointer group"
+                    className="h-[min(540px,calc(100dvh-15rem))] max-h-[72vh] aspect-[1206/2622] cursor-pointer group flex items-center justify-center"
                   >
                     <IPhoneMockup
                       screenshotUrl={MOBILE_APPS[0].screens[bigbangStep].url}
                       alt={MOBILE_APPS[0].screens[bigbangStep].label}
-                      appName="BigBang.Social Live Production"
+                      appName="BigBang.Social Production"
+                      className="h-full aspect-[1206/2622]"
                     />
                   </div>
 
                   {/* Synchronized Screen Selector Pills */}
-                  <div className="flex items-center gap-2 pt-1 w-full max-w-[340px]">
+                  <div className="flex items-center gap-1.5 pt-0.5 w-full max-w-[300px]">
                     {MOBILE_APPS[0].screens.map((screen, idx) => {
                       const isActive = bigbangStep === idx;
                       return (
@@ -553,7 +556,7 @@ export default function BhanuDeveloperPortfolio() {
                             setBigbangStep(idx);
                             openLightbox(MOBILE_APPS[0].screens, idx);
                           }}
-                          className={`flex-1 py-2 px-2.5 rounded-lg text-[13px] font-semibold transition-colors truncate ${
+                          className={`flex-1 py-1.5 px-2 rounded-lg text-[13px] font-semibold transition-colors truncate ${
                             isActive
                               ? 'bg-[#D93800] text-white'
                               : 'bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white'
@@ -565,8 +568,8 @@ export default function BhanuDeveloperPortfolio() {
                     })}
                   </div>
 
-                  <p className="text-[13px] text-[#A2A3B0] text-center max-w-[340px]">
-                    Current Screen: <span className="text-white font-medium">{MOBILE_APPS[0].screens[bigbangStep].label}</span>. Tap to inspect full-res.
+                  <p className="text-[13px] text-[#A2A3B0] text-center max-w-[280px]">
+                    Current Screen: <span className="text-white font-medium">{MOBILE_APPS[0].screens[bigbangStep].label}</span>. Tap to inspect.
                   </p>
                 </div>
               </div>
@@ -579,69 +582,36 @@ export default function BhanuDeveloperPortfolio() {
           id="under25"
           ref={under25Ref}
           data-sc-act="case-study"
-          className="scroll-mt-24 relative w-full lg:min-h-[260vh]"
+          className="scroll-mt-20 relative w-full lg:min-h-[200vh]"
         >
-          <div className="lg:sticky lg:top-0 min-h-[100dvh] flex flex-col justify-center max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-6 lg:py-10">
-            <div className="p-6 sm:p-10 lg:p-12 rounded-2xl bg-[#121318] space-y-8">
+          <div className="lg:sticky lg:top-16 w-full min-h-[calc(100dvh-4rem)] lg:h-[calc(100dvh-4rem)] flex flex-col justify-center px-6 sm:px-10 lg:px-14 py-4 sm:py-6 overflow-hidden bg-[#0A0B10]">
+            <div className="w-full max-w-[1440px] mx-auto h-full flex flex-col justify-center">
               
-              {/* Header Plate */}
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 bg-[#181920] p-6 sm:p-8 rounded-xl">
-                <div className="space-y-2">
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-display">
-                    Under 25 Universe Ecosystem
-                  </h2>
-                  <p className="text-base text-[#E0E0E6] max-w-2xl leading-relaxed">
-                    Spearheaded the mobile architecture for India&apos;s largest student network, supporting
-                    400,000+ users and enabling over $20M+ in campus micro-missions and platform earnings (Milestone {under25Step + 1} of 3).
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <a
-                    href="https://apps.apple.com/us/app/under-25/id1580357687"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
-                  >
-                    <span>App Store</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                  <a
-                    href="https://play.google.com/store/apps/details?id=com.under25universe.under25app"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#22232D] text-white hover:bg-[#2C2E3B] transition-colors flex items-center gap-2"
-                  >
-                    <span>Google Play</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-
-              {/* Architecture Highlights: Inverted Grid (Screens Left, Deep Concurrency Right) */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              {/* Architecture Highlights: Symmetrical Inverted Grid (Large Screens Left, Milestones Right) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 xl:gap-12 items-center">
                 
-                {/* Left Column: Heroic Large Handset Screenshot synced to scroll */}
-                <div className="lg:col-span-5 flex flex-col items-center space-y-4">
-                  <div className="text-base font-semibold text-white flex items-center justify-between w-full max-w-[340px]">
+                {/* Left Column: Heroic Large Handset Screenshot fitted to viewport */}
+                <div className="lg:col-span-5 flex flex-col items-center justify-center space-y-2.5 order-2 lg:order-1">
+                  <div className="text-xs sm:text-sm font-semibold text-white flex items-center justify-between w-full max-w-[320px]">
                     <span>Production Handset Display</span>
                     <span className="text-[13px] text-[#10B981]">Screen {under25Step + 1} of 3</span>
                   </div>
 
-                  {/* Large High-Res Phone Frame */}
+                  {/* Handset Frame with Large Screenshot, constrained cleanly by viewport height */}
                   <div
                     onClick={() => openLightbox(MOBILE_APPS[1].screens, under25Step)}
-                    className="w-full max-w-[280px] sm:max-w-[310px] lg:max-w-[330px] cursor-pointer group"
+                    className="h-[min(540px,calc(100dvh-15rem))] max-h-[72vh] aspect-[1206/2622] cursor-pointer group flex items-center justify-center"
                   >
                     <IPhoneMockup
                       screenshotUrl={MOBILE_APPS[1].screens[under25Step].url}
                       alt={MOBILE_APPS[1].screens[under25Step].label}
-                      appName="Under 25 Universe Live Production"
+                      appName="Under 25 Universe Production"
+                      className="h-full aspect-[1206/2622]"
                     />
                   </div>
 
                   {/* Synchronized Screen Selector Pills */}
-                  <div className="flex items-center gap-2 pt-1 w-full max-w-[340px]">
+                  <div className="flex items-center gap-1.5 pt-0.5 w-full max-w-[300px]">
                     {MOBILE_APPS[1].screens.map((screen, idx) => {
                       const isActive = under25Step === idx;
                       return (
@@ -652,7 +622,7 @@ export default function BhanuDeveloperPortfolio() {
                             setUnder25Step(idx);
                             openLightbox(MOBILE_APPS[1].screens, idx);
                           }}
-                          className={`flex-1 py-2 px-2.5 rounded-lg text-[13px] font-semibold transition-colors truncate ${
+                          className={`flex-1 py-1.5 px-2 rounded-lg text-[13px] font-semibold transition-colors truncate ${
                             isActive
                               ? 'bg-[#10B981] text-white'
                               : 'bg-[#181920] text-[#E0E0E6] hover:bg-[#22232D] hover:text-white'
@@ -664,15 +634,53 @@ export default function BhanuDeveloperPortfolio() {
                     })}
                   </div>
 
-                  <p className="text-[13px] text-[#A2A3B0] text-center max-w-[340px]">
-                    Current Screen: <span className="text-white font-medium">{MOBILE_APPS[1].screens[under25Step].label}</span>. Tap to inspect full-res.
+                  <p className="text-[13px] text-[#A2A3B0] text-center max-w-[280px]">
+                    Current Screen: <span className="text-white font-medium">{MOBILE_APPS[1].screens[under25Step].label}</span>. Tap to inspect.
                   </p>
                 </div>
 
-                {/* Right Column: Systems Engineering Details with Scroll-Driven Active Card */}
-                <div className="lg:col-span-7 space-y-4">
-                  <div className="flex items-center justify-between pb-1">
-                    <h3 className="text-xl sm:text-2xl font-bold text-white font-display">
+                {/* Right Column: Header + Systems Engineering Milestones */}
+                <div className="lg:col-span-7 flex flex-col justify-center space-y-3.5 order-1 lg:order-2">
+                  
+                  {/* Header Plate */}
+                  <div className="space-y-2 pb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white font-display">
+                          Under 25 Universe Ecosystem
+                        </h2>
+                      </div>
+
+                      <div className="flex items-center gap-2 self-start sm:self-auto">
+                        <a
+                          href="https://apps.apple.com/us/app/under-25/id1580357687"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-3.5 py-1.5 rounded-lg text-[13px] font-semibold bg-[#181A22] text-white hover:bg-[#242632] transition-colors flex items-center gap-1.5 border border-[#262836]"
+                        >
+                          <span>App Store</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                        <a
+                          href="https://play.google.com/store/apps/details?id=com.under25universe.under25app"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-3.5 py-1.5 rounded-lg text-[13px] font-semibold bg-[#181A22] text-white hover:bg-[#242632] transition-colors flex items-center gap-1.5 border border-[#262836]"
+                        >
+                          <span>Google Play</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+                    </div>
+
+                    <p className="text-base text-[#D1D1DB] leading-relaxed max-w-2xl">
+                      Student super-app mobile architecture supporting 400,000+ users &amp; $20M+ campus platform earnings (Milestone {under25Step + 1} of 3).
+                    </p>
+                  </div>
+
+                  {/* Milestones Header */}
+                  <div className="flex items-center justify-between pt-0.5">
+                    <h3 className="text-base sm:text-lg font-bold text-white font-display">
                       Core Engineering Milestones
                     </h3>
                     <span className="text-[13px] text-[#A2A3B0] hidden sm:inline">
@@ -680,63 +688,61 @@ export default function BhanuDeveloperPortfolio() {
                     </span>
                   </div>
 
-                  <div className="space-y-3">
+                  {/* Interactive Milestone Cards */}
+                  <div className="space-y-2">
                     <div
                       onClick={() => setUnder25Step(0)}
-                      className={`p-5 sm:p-6 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
+                      className={`p-3 sm:p-3.5 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
                         under25Step === 0
-                          ? 'bg-[#1E2028] border-l-4 border-[#10B981] text-white'
-                          : 'bg-[#181920] opacity-75 hover:opacity-100 text-[#E0E0E6]'
+                          ? 'bg-[#161E1A] border-l-4 border-[#10B981] text-white'
+                          : 'bg-[#101217] opacity-75 hover:opacity-100 text-[#D1D1DB]'
                       }`}
                     >
-                      <h4 className="text-lg font-bold text-white">
+                      <h4 className="text-sm sm:text-base font-bold text-white">
                         200ms Low-Latency WebSocket Chat Engine
                       </h4>
-                      <p className="text-base leading-relaxed mt-1.5">
-                        Offloaded message JSON parsing and socket multiplexing to dedicated background Dart Isolates,
-                        dropping message latency from 500ms down to 200ms for campus discussion spaces.
+                      <p className="text-base leading-relaxed mt-0.5 text-[#E0E0E6]">
+                        Offloaded message JSON parsing and socket multiplexing to dedicated background Dart Isolates, dropping latency to 200ms.
                       </p>
                     </div>
 
                     <div
                       onClick={() => setUnder25Step(1)}
-                      className={`p-5 sm:p-6 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
+                      className={`p-3 sm:p-3.5 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
                         under25Step === 1
-                          ? 'bg-[#1E2028] border-l-4 border-[#10B981] text-white'
-                          : 'bg-[#181920] opacity-75 hover:opacity-100 text-[#E0E0E6]'
+                          ? 'bg-[#161E1A] border-l-4 border-[#10B981] text-white'
+                          : 'bg-[#101217] opacity-75 hover:opacity-100 text-[#D1D1DB]'
                       }`}
                     >
-                      <h4 className="text-lg font-bold text-white">
+                      <h4 className="text-sm sm:text-base font-bold text-white">
                         30+ Reusable Design System Component Library
                       </h4>
-                      <p className="text-base leading-relaxed mt-1.5">
-                        Standardized core widgets across missions, wallets, and community feeds,
-                        accelerating cross-team delivery cycles by 30% and eliminating visual regressions.
+                      <p className="text-base leading-relaxed mt-0.5 text-[#E0E0E6]">
+                        Standardized core widgets across missions, wallets, and community feeds, accelerating feature delivery cycles by 30%.
                       </p>
                     </div>
 
                     <div
                       onClick={() => setUnder25Step(2)}
-                      className={`p-5 sm:p-6 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
+                      className={`p-3 sm:p-3.5 rounded-xl transition-[background-color,border-color,opacity] duration-200 cursor-pointer ${
                         under25Step === 2
-                          ? 'bg-[#1E2028] border-l-4 border-[#10B981] text-white'
-                          : 'bg-[#181920] opacity-75 hover:opacity-100 text-[#E0E0E6]'
+                          ? 'bg-[#161E1A] border-l-4 border-[#10B981] text-white'
+                          : 'bg-[#101217] opacity-75 hover:opacity-100 text-[#D1D1DB]'
                       }`}
                     >
-                      <h4 className="text-lg font-bold text-white">
+                      <h4 className="text-sm sm:text-base font-bold text-white">
                         60 FPS Rendering in Low-Bandwidth Networks
                       </h4>
-                      <p className="text-base leading-relaxed mt-1.5">
-                        Implemented custom local caching layers and repaint boundaries,
-                        preventing layout thrashing on budget Android devices across 400+ campus regions.
+                      <p className="text-base leading-relaxed mt-0.5 text-[#E0E0E6]">
+                        Implemented custom local caching layers and repaint boundaries, preventing layout thrashing on budget Android devices.
                       </p>
                     </div>
                   </div>
 
                   {/* Tech Stack Tags */}
-                  <div className="flex flex-wrap gap-2 pt-1">
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
                     {['Flutter', 'WebSockets', 'Dart Isolates', '30+ Widget System', 'A/B Testing Engine', '60 FPS Profiling'].map((t) => (
-                      <span key={t} className="px-3.5 py-1.5 rounded-lg text-sm bg-[#181920] text-[#F5F5F7]">
+                      <span key={t} className="px-2.5 py-0.5 rounded-md text-[13px] bg-[#12141A] text-[#D1D1DB] border border-[#1E2028]">
                         {t}
                       </span>
                     ))}
