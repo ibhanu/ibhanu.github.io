@@ -91,7 +91,7 @@ export default function StickyScrollShowcase() {
     let isRunning = true;
 
     const updatePhysics = () => {
-      currentXRef.current += (targetXRef.current - currentXRef.current) * 0.14;
+      currentXRef.current += (targetXRef.current - currentXRef.current) * 0.2;
 
       if (railRef.current) {
         railRef.current.style.transform = `translate3d(${currentXRef.current.toFixed(2)}px, 0, 0)`;
@@ -194,12 +194,12 @@ export default function StickyScrollShowcase() {
             return (
               <div
                 key={item.id}
-                className={`flex-shrink-0 w-[88vw] sm:w-[640px] p-6 sm:p-8 rounded-2xl bg-[#121318] flex flex-col lg:flex-row items-center gap-6 sm:gap-8 transition-opacity duration-300 ${
-                  isCurrent ? 'opacity-100' : 'opacity-85'
+                className={`flex-shrink-0 w-[92vw] sm:w-[760px] lg:w-[860px] p-7 sm:p-10 rounded-2xl bg-[#121318] flex flex-col lg:flex-row items-center gap-8 sm:gap-10 transition-opacity duration-300 ${
+                  isCurrent ? 'opacity-100' : 'opacity-35 hover:opacity-75'
                 }`}
               >
                 {/* Hardware Handset */}
-                <div className="flex-shrink-0 w-[210px] sm:w-[240px]">
+                <div className="flex-shrink-0 w-[220px] sm:w-[260px]">
                   <IPhoneMockup
                     screenshotUrl={item.screenshotUrl}
                     alt={`${item.appName}: ${item.headline}`}
@@ -207,16 +207,16 @@ export default function StickyScrollShowcase() {
                 </div>
 
                 {/* Architectural Content & Metric Plate */}
-                <div className="flex-1 space-y-4">
+                <div className="flex-1 space-y-4 max-w-[500px]">
                   <div className="flex items-center justify-between gap-2">
                     <span
-                      className="text-base font-bold text-white font-display"
+                      className="text-lg font-bold text-white font-display"
                     >
                       {item.appName}
                     </span>
                     <a
                       href={`#${item.linkId}`}
-                      className="text-sm text-[#E0E0E6] hover:text-white flex items-center gap-1 transition-colors"
+                      className="text-sm font-semibold text-[#FF5520] hover:text-white flex items-center gap-1 transition-colors"
                     >
                       <span>Deep dive</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -227,16 +227,16 @@ export default function StickyScrollShowcase() {
                     {item.role}
                   </div>
 
-                  <h3 className="text-xl sm:text-2xl font-bold text-[#F5F5F7] tracking-tight leading-snug font-display">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-[#F5F5F7] tracking-tight leading-snug font-display">
                     {item.headline}
                   </h3>
 
-                  <p className="text-base text-[#E0E0E6] leading-relaxed">
+                  <p className="text-base sm:text-[17px] text-[#E0E0E6] leading-relaxed">
                     {item.caption}
                   </p>
 
                   {/* Key Metric Badge */}
-                  <div className="p-3.5 rounded-xl bg-[#181920] flex items-center justify-between">
+                  <div className="p-4 rounded-xl bg-[#181920] flex items-center justify-between">
                     <div>
                       <div
                         className="text-2xl sm:text-3xl font-bold text-white font-display"
@@ -255,7 +255,7 @@ export default function StickyScrollShowcase() {
                     {item.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-3 py-1 rounded-md text-[13px] bg-[#181920] text-[#E0E0E6]"
+                        className="px-3.5 py-1.5 rounded-lg text-[13px] bg-[#181920] text-[#E0E0E6]"
                       >
                         {tag}
                       </span>
